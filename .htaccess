@@ -1,0 +1,9 @@
+RewriteEngine On
+RewriteBase /Error404/
+
+# Laisser passer les fichiers existants
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Rediriger tout vers index.php
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
