@@ -1,6 +1,14 @@
 <?php
-require_once 'core/Router.php';
-require_once 'core/Controller.php';
+session_start();
 
-$router = new Router();
-$router->run();
+$controller = $_GET['controller'] ?? 'chatbot';
+$action = $_GET['action'] ?? 'index';
+
+if ($controller == '') {
+    require 'controllers/.php';
+} elseif ($controller == 'chatbot') {
+    require 'controllers/ChatBotController.php';
+} else {
+    echo "Controller non trouvé";
+}
+
