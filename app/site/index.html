@@ -50,10 +50,40 @@
         </div>
     </div>
 
+    <!-- MODE 4: Progression Tower -->
+    <div id="mode4-game-area" class="hidden">
+        <canvas id="mode4-canvas"></canvas>
+        <div id="mode4-hud">
+            <div class="mode4-hud-item">
+                <span class="label">NIVEAU</span>
+                <span id="mode4-level" class="value">01</span>
+            </div>
+            <div class="mode4-hud-item">
+                <span class="label">SCORE</span>
+                <span id="mode4-score" class="value">00000</span>
+            </div>
+            <div class="mode4-hud-item">
+                <span class="label">VIES</span>
+                <span id="mode4-lives" class="value">❤️❤️❤️</span>
+            </div>
+            <div class="mode4-hud-item">
+                <span class="label">OBJECTIF</span>
+                <span id="mode4-objective" class="value">0/10</span>
+            </div>
+        </div>
+        <div id="mode4-level-complete" class="hidden">
+            <div class="level-complete-content">
+                <h2>🎉 NIVEAU COMPLÉTÉ !</h2>
+                <p id="level-complete-message"></p>
+                <button onclick="nextLevel()">NIVEAU SUIVANT ➜</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Popup d'information NIRD -->
     <div id="nird-popup" class="hidden">
         <div class="popup-content">
-            <h3 id="popup-title">📚 Pratique NIRD</h3>
+            <h3 id="popup-title">Pratique NIRD</h3>
             <p id="popup-text"></p>
             <button onclick="closeNirdPopup()">Compris !</button>
         </div>
@@ -61,11 +91,12 @@
 
     <div id="message-overlay">
         <h1>[MISSION NIRD] LA ZERGUÈM DE LA NUIT</h1>
-        <p>Le Numérique Éphémère tente de brouiller le signal NIRD. Détruisez les concepts clés (+10) et éliminez les drones ennemis (❌, +25) avant qu'ils ne vous touchent (-30) !</p>
+        <p>Le Numérique Éphémère tente de brouiller le signal NIRD. Détruisez les concepts clés (+10) et éliminez les drones ennemis (+25) avant qu'ils ne vous touchent (-30) !</p>
         <div class="mode-selector">
             <button onclick="startGame(1)" class="mode-btn">MODE 1: CLASSIQUE</button>
             <button onclick="startGame(2)" class="mode-btn">MODE 2: SURVIE</button>
-            <button onclick="startGame(3)" class="mode-btn mode-3-btn">MODE 3: LASER GAME 🎮</button>
+            <button onclick="startGame(3)" class="mode-btn mode-3-btn">MODE 3: LASER GAME</button>
+            <button onclick="startGame(4)" class="mode-btn mode-4-btn">MODE 4: PROGRESSION TOWER</button>
         </div>
         <div class="instruction-note">
             <p><strong>Note:</strong> Ce jeu nécessite l'audio (Impact.mp3, Miss.mp3, Pain.mp3) pour une immersion complète.</p>

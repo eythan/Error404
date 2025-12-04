@@ -180,6 +180,12 @@ function startGame(mode = 1) {
         return;
     }
     
+    // Mode 4: Progression Tower
+    if (mode === 4) {
+        startMode4Game();
+        return;
+    }
+    
     // Modes 1 et 2
     isGameRunning = true;
     score = 0;
@@ -683,15 +689,465 @@ function endMode3Game() {
     showScoreTable();
 }
 
+// ====================================
+// MODE 4: PROGRESSION TOWER
+// ====================================
+
+const MODE4_CONFIG = {
+    CANVAS_WIDTH: 900,
+    CANVAS_HEIGHT: 700,
+    PLAYER_SIZE: 35,
+    PLAYER_SPEED: 5,
+    BULLET_SPEED: 10,
+    BULLET_SIZE: 8,
+    ENEMY_SIZE: 30,
+    PLATFORM_HEIGHT: 20,
+    JUMP_FORCE: 12,
+    GRAVITY: 0.5,
+};
+
+const MODE4_LEVELS = [
+    {
+        level: 1,
+        name: "Comprendre les bases",
+        objective: 10,
+        enemySpeed: 1,
+        enemySpawnRate: 180,
+        message: "Bien joué ! Vous maîtrisez les concepts de base du NIRD. Continuez votre progression !"
+    },
+    {
+        level: 2,
+        name: "Évaluer ses progrès",
+        objective: 15,
+        enemySpeed: 1.3,
+        enemySpawnRate: 150,
+        message: "Excellent ! L'auto-évaluation est la clé de l'amélioration continue."
+    },
+    {
+        level: 3,
+        name: "Contribuer activement",
+        objective: 20,
+        enemySpeed: 1.6,
+        enemySpawnRate: 120,
+        message: "Fantastique ! Votre contribution fait la différence dans la communauté."
+    },
+    {
+        level: 4,
+        name: "Maintenir la motivation",
+        objective: 25,
+        enemySpeed: 2,
+        enemySpawnRate: 100,
+        message: "Incroyable ! Votre motivation intrinsèque vous pousse vers l'excellence."
+    },
+    {
+        level: 5,
+        name: "Maître du NIRD",
+        objective: 30,
+        enemySpeed: 2.5,
+        enemySpawnRate: 80,
+        message: "🏆 FÉLICITATIONS ! Vous êtes un Maître du NIRD ! Votre progression est exemplaire !"
+    }
+];
+
+let mode4State = {
+    canvas: null,
+    ctx: null,
+    player: { 
+        x: 100, 
+        y: 500, 
+        vx: 0, 
+        vy: 0, 
+        onGround: false,
+        facingRight: true
+    },
+    keys: {},
+    bullets: [],
+    enemies: [],
+    platforms: [],
+    score: 0,
+    level: 1,
+    lives: 3,
+    killsThisLevel: 0,
+    frameCount: 0,
+    animationId: null,
+    isPaused: false
+};
+
+function startMode4Game() {
+    messageOverlay.style.display = 'none';
+    document.getElementById('hud-container').style.display = 'none';
+    gameArea.style.display = 'none';
+    
+    const mode4Area = document.getElementById('mode4-game-area');
+    mode4Area.classList.remove('hidden');
+    
+    mode4State.canvas = document.getElementById('mode4-canvas');
+    mode4State.ctx = mode4State.canvas.getContext('2d');
+    
+    // Configurer le canvas
+    mode4State.canvas.width = MODE4_CONFIG.CANVAS_WIDTH;
+    mode4State.canvas.height = MODE4_CONFIG.CANVAS_HEIGHT;
+    
+    // Réinitialiser l'état
+    initMode4Level();
+    
+    // Event listeners
+    document.addEventListener('keydown', mode4KeyDown);
+    document.addEventListener('keyup', mode4KeyUp);
+    
+    isGameRunning = true;
+    mode4GameLoop();
+}
+
+function initMode4Level() {
+    mode4State.player = { 
+        x: 100, 
+        y: 500, 
+        vx: 0, 
+        vy: 0, 
+        onGround: false,
+        facingRight: true
+    };
+    mode4State.keys = {};
+    mode4State.bullets = [];
+    mode4State.enemies = [];
+    mode4State.frameCount = 0;
+    mode4State.killsThisLevel = 0;
+    mode4State.isPaused = false;
+    
+    // Créer les plateformes
+    mode4State.platforms = [
+        { x: 0, y: MODE4_CONFIG.CANVAS_HEIGHT - 50, width: MODE4_CONFIG.CANVAS_WIDTH, height: 50 },
+        { x: 150, y: 550, width: 200, height: MODE4_CONFIG.PLATFORM_HEIGHT },
+        { x: 450, y: 450, width: 200, height: MODE4_CONFIG.PLATFORM_HEIGHT },
+        { x: 100, y: 350, width: 150, height: MODE4_CONFIG.PLATFORM_HEIGHT },
+        { x: 550, y: 300, width: 180, height: MODE4_CONFIG.PLATFORM_HEIGHT },
+        { x: 300, y: 200, width: 250, height: MODE4_CONFIG.PLATFORM_HEIGHT }
+    ];
+    
+    updateMode4HUD();
+}
+
+function mode4KeyDown(e) {
+    if (['z', 'q', 's', 'd', 'Z', 'Q', 'S', 'D', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+        e.preventDefault();
+        mode4State.keys[e.key.toLowerCase()] = true;
+        
+        // Saut
+        if ((e.key === 'z' || e.key === 'Z' || e.key === 'ArrowUp') && mode4State.player.onGround) {
+            mode4State.player.vy = -MODE4_CONFIG.JUMP_FORCE;
+            mode4State.player.onGround = false;
+        }
+        
+        // Tir
+        if (e.key === ' ') {
+            mode4Shoot();
+        }
+    }
+}
+
+function mode4KeyUp(e) {
+    mode4State.keys[e.key.toLowerCase()] = false;
+}
+
+function mode4Shoot() {
+    if (!isGameRunning || mode4State.isPaused) return;
+    
+    const bullet = {
+        x: mode4State.player.x + (mode4State.player.facingRight ? MODE4_CONFIG.PLAYER_SIZE : 0),
+        y: mode4State.player.y + MODE4_CONFIG.PLAYER_SIZE / 2,
+        vx: mode4State.player.facingRight ? MODE4_CONFIG.BULLET_SPEED : -MODE4_CONFIG.BULLET_SPEED
+    };
+    
+    mode4State.bullets.push(bullet);
+    
+    if (soundHit) {
+        soundHit.currentTime = 0;
+        soundHit.play().catch(() => {});
+    }
+}
+
+function mode4GameLoop() {
+    if (!isGameRunning) return;
+    
+    if (!mode4State.isPaused) {
+        mode4State.frameCount++;
+        
+        // Déplacer le joueur
+        let dx = 0;
+        if (mode4State.keys['q'] || mode4State.keys['arrowleft']) {
+            dx -= MODE4_CONFIG.PLAYER_SPEED;
+            mode4State.player.facingRight = false;
+        }
+        if (mode4State.keys['d'] || mode4State.keys['arrowright']) {
+            dx += MODE4_CONFIG.PLAYER_SPEED;
+            mode4State.player.facingRight = true;
+        }
+        
+        mode4State.player.vx = dx;
+        mode4State.player.x += mode4State.player.vx;
+        
+        // Gravité
+        mode4State.player.vy += MODE4_CONFIG.GRAVITY;
+        mode4State.player.y += mode4State.player.vy;
+        
+        // Limites du canvas
+        if (mode4State.player.x < 0) mode4State.player.x = 0;
+        if (mode4State.player.x > MODE4_CONFIG.CANVAS_WIDTH - MODE4_CONFIG.PLAYER_SIZE) {
+            mode4State.player.x = MODE4_CONFIG.CANVAS_WIDTH - MODE4_CONFIG.PLAYER_SIZE;
+        }
+        
+        // Collision avec les plateformes
+        mode4State.player.onGround = false;
+        mode4State.platforms.forEach(platform => {
+            if (mode4State.player.x + MODE4_CONFIG.PLAYER_SIZE > platform.x &&
+                mode4State.player.x < platform.x + platform.width &&
+                mode4State.player.y + MODE4_CONFIG.PLAYER_SIZE > platform.y &&
+                mode4State.player.y + MODE4_CONFIG.PLAYER_SIZE < platform.y + platform.height &&
+                mode4State.player.vy >= 0) {
+                mode4State.player.y = platform.y - MODE4_CONFIG.PLAYER_SIZE;
+                mode4State.player.vy = 0;
+                mode4State.player.onGround = true;
+            }
+        });
+        
+        // Spawn ennemis
+        const currentLevel = MODE4_LEVELS[mode4State.level - 1];
+        if (mode4State.frameCount % currentLevel.enemySpawnRate === 0) {
+            spawnMode4Enemy();
+        }
+        
+        // Déplacer les ennemis
+        mode4State.enemies.forEach(enemy => {
+            enemy.x += enemy.vx;
+            
+            // Rebond sur les bords
+            if (enemy.x < 0 || enemy.x > MODE4_CONFIG.CANVAS_WIDTH - MODE4_CONFIG.ENEMY_SIZE) {
+                enemy.vx *= -1;
+            }
+            
+            // Gravité pour les ennemis
+            enemy.vy += MODE4_CONFIG.GRAVITY;
+            enemy.y += enemy.vy;
+            
+            // Collision ennemis-plateformes
+            mode4State.platforms.forEach(platform => {
+                if (enemy.x + MODE4_CONFIG.ENEMY_SIZE > platform.x &&
+                    enemy.x < platform.x + platform.width &&
+                    enemy.y + MODE4_CONFIG.ENEMY_SIZE > platform.y &&
+                    enemy.y + MODE4_CONFIG.ENEMY_SIZE < platform.y + platform.height &&
+                    enemy.vy >= 0) {
+                    enemy.y = platform.y - MODE4_CONFIG.ENEMY_SIZE;
+                    enemy.vy = 0;
+                }
+            });
+        });
+        
+        // Déplacer les balles
+        mode4State.bullets = mode4State.bullets.filter(bullet => {
+            bullet.x += bullet.vx;
+            return bullet.x > 0 && bullet.x < MODE4_CONFIG.CANVAS_WIDTH;
+        });
+        
+        // Collision balles-ennemis
+        mode4State.bullets.forEach((bullet, bi) => {
+            mode4State.enemies.forEach((enemy, ei) => {
+                const dx = bullet.x - (enemy.x + MODE4_CONFIG.ENEMY_SIZE / 2);
+                const dy = bullet.y - (enemy.y + MODE4_CONFIG.ENEMY_SIZE / 2);
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist < MODE4_CONFIG.ENEMY_SIZE / 2) {
+                    mode4State.bullets.splice(bi, 1);
+                    mode4State.enemies.splice(ei, 1);
+                    mode4State.score += 100;
+                    mode4State.killsThisLevel++;
+                    updateMode4HUD();
+                    
+                    // Vérifier si le niveau est terminé
+                    if (mode4State.killsThisLevel >= currentLevel.objective) {
+                        completeLevel();
+                    }
+                }
+            });
+        });
+        
+        // Collision joueur-ennemis
+        mode4State.enemies = mode4State.enemies.filter(enemy => {
+            const dx = mode4State.player.x - enemy.x;
+            const dy = mode4State.player.y - enemy.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            
+            if (dist < MODE4_CONFIG.PLAYER_SIZE) {
+                mode4State.lives--;
+                updateMode4HUD();
+                
+                if (soundPain) {
+                    soundPain.currentTime = 0;
+                    soundPain.play().catch(() => {});
+                }
+                
+                if (mode4State.lives <= 0) {
+                    endMode4Game();
+                }
+                return false;
+            }
+            return true;
+        });
+    }
+    
+    // Dessiner
+    mode4Draw();
+    
+    mode4State.animationId = requestAnimationFrame(mode4GameLoop);
+}
+
+function spawnMode4Enemy() {
+    const currentLevel = MODE4_LEVELS[mode4State.level - 1];
+    const enemy = {
+        x: Math.random() > 0.5 ? 0 : MODE4_CONFIG.CANVAS_WIDTH - MODE4_CONFIG.ENEMY_SIZE,
+        y: 100,
+        vx: (Math.random() > 0.5 ? 1 : -1) * currentLevel.enemySpeed,
+        vy: 0,
+        type: Math.floor(Math.random() * 3)
+    };
+    mode4State.enemies.push(enemy);
+}
+
+function mode4Draw() {
+    const ctx = mode4State.ctx;
+    
+    // Fond avec dégradé
+    const gradient = ctx.createLinearGradient(0, 0, 0, MODE4_CONFIG.CANVAS_HEIGHT);
+    gradient.addColorStop(0, '#030312');
+    gradient.addColorStop(1, '#0a0a20');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, MODE4_CONFIG.CANVAS_WIDTH, MODE4_CONFIG.CANVAS_HEIGHT);
+    
+    // Grille
+    ctx.strokeStyle = 'rgba(0, 255, 200, 0.05)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < MODE4_CONFIG.CANVAS_WIDTH; i += 50) {
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, MODE4_CONFIG.CANVAS_HEIGHT);
+        ctx.stroke();
+    }
+    
+    // Plateformes
+    mode4State.platforms.forEach(platform => {
+        ctx.fillStyle = '#00ffc8';
+        ctx.shadowColor = '#00ffc8';
+        ctx.shadowBlur = 10;
+        ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+        ctx.shadowBlur = 0;
+        
+        // Bordure
+        ctx.strokeStyle = '#00ffff';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(platform.x, platform.y, platform.width, platform.height);
+    });
+    
+    // Ennemis
+    mode4State.enemies.forEach(enemy => {
+        const colors = ['#ff3333', '#ff6633', '#ff3366'];
+        ctx.fillStyle = colors[enemy.type];
+        ctx.shadowColor = colors[enemy.type];
+        ctx.shadowBlur = 15;
+        
+        // Corps de l'ennemi (carré avec rotation)
+        ctx.save();
+        ctx.translate(enemy.x + MODE4_CONFIG.ENEMY_SIZE / 2, enemy.y + MODE4_CONFIG.ENEMY_SIZE / 2);
+        ctx.rotate(mode4State.frameCount * 0.05);
+        ctx.fillRect(-MODE4_CONFIG.ENEMY_SIZE / 2, -MODE4_CONFIG.ENEMY_SIZE / 2, MODE4_CONFIG.ENEMY_SIZE, MODE4_CONFIG.ENEMY_SIZE);
+        ctx.restore();
+        
+        ctx.shadowBlur = 0;
+    });
+    
+    // Balles
+    ctx.fillStyle = '#ffff00';
+    ctx.shadowColor = '#ffff00';
+    ctx.shadowBlur = 10;
+    mode4State.bullets.forEach(bullet => {
+        ctx.beginPath();
+        ctx.arc(bullet.x, bullet.y, MODE4_CONFIG.BULLET_SIZE / 2, 0, Math.PI * 2);
+        ctx.fill();
+    });
+    ctx.shadowBlur = 0;
+    
+    // Joueur
+    ctx.fillStyle = '#00ffc8';
+    ctx.shadowColor = '#00ffc8';
+    ctx.shadowBlur = 20;
+    ctx.fillRect(mode4State.player.x, mode4State.player.y, MODE4_CONFIG.PLAYER_SIZE, MODE4_CONFIG.PLAYER_SIZE);
+    ctx.shadowBlur = 0;
+    
+    // Yeux du joueur
+    ctx.fillStyle = '#fff';
+    const eyeOffset = mode4State.player.facingRight ? 15 : 5;
+    ctx.fillRect(mode4State.player.x + eyeOffset, mode4State.player.y + 10, 5, 5);
+    ctx.fillRect(mode4State.player.x + eyeOffset, mode4State.player.y + 20, 5, 5);
+}
+
+function updateMode4HUD() {
+    const currentLevel = MODE4_LEVELS[mode4State.level - 1];
+    document.getElementById('mode4-level').textContent = String(mode4State.level).padStart(2, '0');
+    document.getElementById('mode4-score').textContent = String(mode4State.score).padStart(5, '0');
+    document.getElementById('mode4-lives').textContent = '❤️'.repeat(mode4State.lives);
+    document.getElementById('mode4-objective').textContent = `${mode4State.killsThisLevel}/${currentLevel.objective}`;
+}
+
+function completeLevel() {
+    mode4State.isPaused = true;
+    const currentLevel = MODE4_LEVELS[mode4State.level - 1];
+    
+    const overlay = document.getElementById('mode4-level-complete');
+    const message = document.getElementById('level-complete-message');
+    
+    message.textContent = currentLevel.message;
+    overlay.classList.remove('hidden');
+}
+
+function nextLevel() {
+    document.getElementById('mode4-level-complete').classList.add('hidden');
+    
+    if (mode4State.level >= MODE4_LEVELS.length) {
+        // Jeu terminé !
+        endMode4Game();
+    } else {
+        mode4State.level++;
+        initMode4Level();
+    }
+}
+
+function endMode4Game() {
+    isGameRunning = false;
+    cancelAnimationFrame(mode4State.animationId);
+    
+    document.removeEventListener('keydown', mode4KeyDown);
+    document.removeEventListener('keyup', mode4KeyUp);
+    
+    score = mode4State.score;
+    showScoreTable();
+}
+
 // Initialisation au chargement de la page
 document.addEventListener('DOMContentLoaded', () => {
     messageOverlay.style.display = 'flex';
     
     // Ajouter le bouton de fin de partie pour le mode 3
     const mode3Area = document.getElementById('mode3-game-area');
-    const endButton = document.createElement('button');
-    endButton.textContent = 'TERMINER LA MISSION';
-    endButton.className = 'end-mode3-btn';
-    endButton.onclick = endMode3Game;
-    mode3Area.appendChild(endButton);
+    const endButton3 = document.createElement('button');
+    endButton3.textContent = 'TERMINER LA MISSION';
+    endButton3.className = 'end-mode3-btn';
+    endButton3.onclick = endMode3Game;
+    mode3Area.appendChild(endButton3);
+    
+    // Ajouter le bouton de fin de partie pour le mode 4
+    const mode4Area = document.getElementById('mode4-game-area');
+    const endButton4 = document.createElement('button');
+    endButton4.textContent = 'TERMINER LA MISSION';
+    endButton4.className = 'end-mode3-btn';
+    endButton4.onclick = endMode4Game;
+    mode4Area.appendChild(endButton4);
 });
