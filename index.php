@@ -4,11 +4,12 @@ session_start();
 $controller = $_GET['controller'] ?? 'chatbot';
 $action = $_GET['action'] ?? 'index';
 
-if ($controller == '') {
-    require 'controllers/.php';
+if ($controller == 'main') {
+    require 'controllers/MainController.php';
 } elseif ($controller == 'chatbot') {
     require 'controllers/ChatBotController.php';
-} else {
+} 
+else {
     echo "Controller non trouvé";
 }
 
