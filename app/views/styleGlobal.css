@@ -22,7 +22,6 @@ body {
     min-height: 100vh;
 }
 
-/* Effet Scanlines */
 body::after {
     content: "";
     position: absolute;
@@ -33,10 +32,9 @@ body::after {
     z-index: 999;
 }
 
-/* HEADER STYLE */
 header {
     text-align: center;
-    padding: 40px 20px;
+    padding: 40px 20px 20px 20px; /* Ajusté padding pour la navigation */
     background: rgba(0,0,0,0.6);
     border-bottom: 2px solid var(--neon-pink);
     box-shadow: 0 0 20px var(--neon-pink);
@@ -47,8 +45,21 @@ h1 {
     margin: 0;
     text-transform: uppercase;
     color: #fff;
-    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px var(--neon-pink), 0 0 40px var(--neon-pink);
+    text-shadow: 
+        0 0 5px #fff,
+        0 0 10px #fff,
+        0 0 20px var(--neon-pink),
+        0 0 40px var(--neon-pink);
     letter-spacing: 10px;
+}
+
+h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2rem;
+    color: var(--neon-blue);
+    margin-bottom: 30px;
+    text-shadow: 0 0 10px var(--neon-blue);
+    text-align: center;
 }
 
 .subtitle {
@@ -58,7 +69,20 @@ h1 {
     margin-top: 10px;
 }
 
-/* CONTAINER STYLE */
+.nav-links a {
+    color: var(--neon-green);
+    text-decoration: none;
+    margin: 0 20px;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    text-shadow: 0 0 5px var(--neon-green);
+    transition: text-shadow 0.3s;
+}
+
+.nav-links a:hover {
+    text-shadow: 0 0 15px var(--neon-green), 0 0 20px var(--neon-green);
+}
+
 .container {
     max-width: 800px;
     margin: 50px auto;
@@ -68,13 +92,13 @@ h1 {
     box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
     border-radius: 5px;
     position: relative;
-    z-index: 10; /* Au dessus des scanlines si besoin */
 }
 
 .container::before {
     content: "SYSTEM_STATUS: ONLINE";
     position: absolute;
-    top: -12px; left: 20px;
+    top: -12px;
+    left: 20px;
     background: var(--bg-dark);
     padding: 0 10px;
     color: var(--neon-green);
@@ -102,7 +126,8 @@ p {
     padding-top: 20px;
 }
 
-/* JEU SNAKE OVERLAY */
+/* Styles du jeu Snake */
+
 #game-overlay {
     display: none;
     position: fixed;
@@ -115,7 +140,10 @@ p {
     backdrop-filter: blur(5px);
 }
 
-#game-ui { text-align: center; margin-bottom: 20px; }
+#game-ui {
+    text-align: center;
+    margin-bottom: 20px;
+}
 
 #game-title {
     color: var(--neon-green);
