@@ -1,0 +1,160 @@
+// script.js
+
+// --- A. INJECTION DU HEADER ---
+// Ceci va chercher le fichier header.html et le mettre au début du body
+fetch('header.php')
+    .then(response => response.text())
+    .then(data => {
+        document.body.insertAdjacentHTML('afterbegin', data);
+    })
+    .catch(error => console.error('Erreur chargement header:', error));
+
+
+// --- B. CREATION DU HTML DU JEU (Automatique) ---
+// On crée les éléments du jeu en JS pour ne pas avoir à les copier sur chaque page HTML
+const gameHTML = `
+<div id="game-overlay">
+    <div id="game-ui">
+        <div id="game-title">SYSTEM HACKED: SNAKE PROTOCOL</div>
+        <div id="score-board">SCORE: <span id="score">0</span></div>
+    </div>
+    <canvas id="snakeCanvas" width="400" height="400"></canvas>
+    <button id="close-btn" onclick="closeGame()">FERMER LA SIMULATION</button>
+</div>`;
+document.body.insertAdjacentHTML('beforeend', gameHTML);
+
+
+// --- C. SYSTÈME D'ACTIVATION (Code: nird) ---
+const secretCode = ['d', 'r', 'i', 'n']; 
+let inputSequence = [];
+let gameRunning = false;
+let gameLoop;
+
+window.addEventListener('keydown', (e) => {
+    inputSequence.push(e.key.toLowerCase());
+    if (inputSequence.length > secretCode.length) inputSequence.shift();
+    if (JSON.stringify(inputSequence) === JSON.stringify(secretCode)) activateGame();
+});
+
+function activateGame() {
+    const overlay = document.getElementById('game-overlay');
+    if(overlay) {
+        overlay.style.display = 'flex';
+        document.body.classList.add('glitch-active');
+        setTimeout(() => document.body.classList.remove('glitch-active'), 500);
+        if (!gameRunning) initGame();
+    }
+}
+
+window.closeGame = function() { // Rendre la fonction accessible globalement
+    document.getElementById('game-overlay').style.display = 'none';
+    gameRunning = false;
+    clearInterval(gameLoop);
+    inputSequence = [];
+}
+
+// --- D. MOTEUR JEU SNAKE ---
+// (Variables globales pour éviter les conflits)
+let canvas, ctx, snake, food, score, d;
+const box = 20;
+
+function initGame() {
+    canvas = document.getElementById("snakeCanvas");
+    ctx = canvas.getContext("2d");
+    gameRunning = true;
+    snake = [{ x: 9 * box, y: 10 * box }];
+    score = 0;
+    document.getElementById('score').innerText = score;
+    d = "RIGHT";
+    createFood();
+    if(gameLoop) clearInterval(gameLoop);
+    gameLoop = setInterval(draw, 95); // Vitesse modifiée comme demandé
+    document.addEventListener("keydown", direction);
+}
+
+function direction(event) {
+    let key = event.keyCode;
+    if (key == 37 && d != "RIGHT") d = "LEFT";
+    else if (key == 38 && d != "DOWN") d = "UP";
+    else if (key == 39 && d != "LEFT") d = "RIGHT";
+    else if (key == 40 && d != "UP") d = "DOWN";
+}
+
+function createFood() {
+    food = {
+        x: Math.floor(Math.random() * 19 + 1) * box,
+        y: Math.floor(Math.random() * 19 + 1) * box
+    };
+}
+
+function draw() {
+    ctx.fillStyle = "#050510";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.strokeStyle = "#1a1a1a";
+    for(let i=0; i<canvas.width; i+=box) {
+        ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,canvas.height); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0,i); ctx.lineTo(canvas.width,i); ctx.stroke();
+    }
+
+    for (let i = 0; i < snake.length; i++) {
+        ctx.fillStyle = (i == 0) ? "#0aff0a" : "#00f3ff";
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = ctx.fillStyle;
+        ctx.fillRect(snake[i].x, snake[i].y, box, box);
+        ctx.strokeStyle = "#000";
+        ctx.shadowBlur = 0;
+        ctx.strokeRect(snake[i].x, snake[i].y, box, box);
+    }
+
+    ctx.fillStyle = "#ff0055";
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = "#ff0055";
+    ctx.fillRect(food.x, food.y, box, box);
+    ctx.shadowBlur = 0;
+
+    let snakeX = snake[0].x;
+    let snakeY = snake[0].y;
+
+    if (d == "LEFT") snakeX -= box;
+    if (d == "UP") snakeY -= box;
+    if (d == "RIGHT") snakeX += box;
+    if (d == "DOWN") snakeY += box;
+
+    if (snakeX == food.x && snakeY == food.y) {
+        score++;
+        document.getElementById('score').innerText = score;
+        createFood();
+    } else {
+        snake.pop();
+    }
+
+    let newHead = { x: snakeX, y: snakeY };
+
+    if (snakeX < 0 || snakeX >= canvas.width || snakeY < 0 || snakeY >= canvas.height || collision(newHead, snake)) {
+        clearInterval(gameLoop);
+        gameRunning = false;
+        ctx.fillStyle = "white";
+        ctx.font = "40px 'Orbitron'";
+        ctx.textAlign = "center";
+        ctx.fillText("GAME OVER", canvas.width/2, canvas.height/2);
+        ctx.font = "20px 'VT323'";
+        ctx.fillText("Appuyez sur ESPACE pour relancer", canvas.width/2, canvas.height/2 + 40);
+        document.addEventListener('keydown', restartHandler);
+    }
+    snake.unshift(newHead);
+}
+
+function restartHandler(e) {
+    if(e.code === "Space" && !gameRunning) {
+        document.removeEventListener('keydown', restartHandler);
+        initGame();
+    }
+}
+
+function collision(head, array) {
+    for (let i = 0; i < array.length; i++) {
+        if (head.x == array[i].x && head.y == array[i].y) return true;
+    }
+    return false;
+}
