@@ -105,6 +105,7 @@ body {
     position: relative;
     z-index: 2;
 }
+.hidden { display: none !important; }
 
 .cible, .ennemi {
     position: absolute;
@@ -210,52 +211,39 @@ body {
     gap: 20px;
     flex-wrap: wrap;
     justify-content: center;
-    margin-bottom: 20px;
 }
-
 .mode-btn {
     padding: 15px 30px;
-    background: var(--neon-green);
-    border: none;
-    color: var(--primary-bg);
-    font-weight: 700;
-    font-size: 1em;
+    background: var(--hud-bg);
+    border: 2px solid var(--neon-green);
+    color: var(--neon-green);
+    font-family: var(--font-primary);
+    font-size: 1.1em;
     cursor: pointer;
     border-radius: 5px;
-    box-shadow: 0 0 10px var(--neon-green);
     transition: all 0.3s;
     text-transform: uppercase;
-    font-family: var(--font-primary);
 }
-
 .mode-btn:hover {
-    background: #fff;
-    box-shadow: 0 0 30px #fff;
-    transform: translateY(-3px);
+    box-shadow: 0 0 25px var(--neon-green);
 }
-
 .mode-3-btn {
-    background: linear-gradient(135deg, var(--neon-green), #00d4aa);
-    font-size: 1.1em;
-    animation: pulseMode3 2s infinite;
+    border-color: #00ccff;
+    color: #00ccff;
 }
-
-@keyframes pulseMode3 {
-    0%, 100% { box-shadow: 0 0 10px var(--neon-green); }
-    50% { box-shadow: 0 0 25px var(--neon-green), 0 0 40px var(--neon-green); }
+.mode-3-btn:hover {
+    box-shadow: 0 0 25px #00ccff;
 }
-
 .mode-4-btn {
-    background: linear-gradient(135deg, #9d4edd, #c77dff);
-    font-size: 1.1em;
-    animation: pulseMode4 2.5s infinite;
+    /* Couleur violette pour le Mode 4 */
+    border-color: #c77dff; 
+    color: #c77dff;
+}
+.mode-4-btn:hover {
+    box-shadow: 0 0 25px #c77dff;
 }
 
-@keyframes pulseMode4 {
-    0%, 100% { box-shadow: 0 0 10px #9d4edd; }
-    50% { box-shadow: 0 0 25px #c77dff, 0 0 40px #c77dff; }
-}
-
+/* Boutons classiques */
 button {
     padding: 15px 40px;
     background: var(--neon-green);
@@ -277,45 +265,34 @@ button:hover {
 }
 
 /* Tableau de score */
-#score-table-overlay.hidden {
-    display: none;
-}
-#score-table-overlay h3 {
-    color: #fff;
-    font-family: var(--font-primary);
-    margin-bottom: 30px;
-}
-.score-card {
+#score-table-overlay.hidden { display: none; }
+#score-table-overlay h3 { color: #fff; font-family: var(--font-primary); margin-bottom: 30px; }
+.score-card { 
     background: var(--hud-bg);
     border: 1px solid var(--neon-green);
     box-shadow: 0 0 15px var(--neon-green);
     padding: 20px;
     border-radius: 10px;
 }
-#score-table-overlay table {
-    width: 100%;
-    max-width: 650px;
-    border-collapse: collapse;
-}
-#score-table-overlay th, #score-table-overlay td {
-    padding: 12px 15px;
-    text-align: left;
-    color: #fff;
-    font-weight: 500;
+#score-table-overlay table { width: 100%; max-width: 650px; border-collapse: collapse; }
+#score-table-overlay th, #score-table-overlay td { 
+    padding: 12px 15px; 
+    text-align: left; 
+    color: #fff; 
+    font-weight: 500; 
     border-bottom: 1px solid rgba(0, 255, 200, 0.2);
 }
-#score-table-overlay th {
-    font-family: var(--font-primary);
-    font-weight: 400;
-    text-transform: uppercase;
-    font-size: 0.9em;
+#score-table-overlay th { 
+    font-family: var(--font-primary); 
+    font-weight: 400; 
+    text-transform: uppercase; 
+    font-size: 0.9em; 
     color: var(--neon-green);
 }
-
-.top-score {
-    background: rgba(0, 255, 200, 0.1);
+.top-score { 
+    background: rgba(0, 255, 200, 0.1); 
     box-shadow: 0 0 10px rgba(0, 255, 200, 0.3);
-}
+} 
 
 /* 5. MODE 3: LASER GAME TOP-DOWN */
 #mode3-game-area {
@@ -324,25 +301,19 @@ button:hover {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: var(--primary-bg);
-    z-index: 2000;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
+    z-index: 100;
+    flex-direction: column;
 }
-
-#mode3-game-area.hidden {
-    display: none;
-}
-
 #mode3-canvas {
-    border: 3px solid var(--neon-green);
-    box-shadow: 0 0 30px var(--neon-green), inset 0 0 20px rgba(0, 255, 200, 0.1);
-    border-radius: 10px;
-    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="6" fill="none" stroke="%2300ffc8" stroke-width="2"/><circle cx="16" cy="16" r="2" fill="%2300ffc8"/><line x1="16" y1="4" x2="16" y2="10" stroke="%2300ffc8" stroke-width="2"/><line x1="16" y1="22" x2="16" y2="28" stroke="%2300ffc8" stroke-width="2"/><line x1="4" y1="16" x2="10" y2="16" stroke="%2300ffc8" stroke-width="2"/><line x1="22" y1="16" x2="28" y2="16" stroke="%2300ffc8" stroke-width="2"/></svg>') 16 16, crosshair;
+    border: 4px solid #00ccff;
+    box-shadow: 0 0 30px #00ccff, inset 0 0 15px #00ccff;
+    background-color: var(--primary-bg);
+    margin-bottom: 20px;
+    cursor: crosshair;
 }
-
 #mode3-hud {
     position: absolute;
     top: 20px;
@@ -350,44 +321,15 @@ button:hover {
     transform: translateX(-50%);
     display: flex;
     gap: 30px;
-    padding: 15px 30px;
+    padding: 10px 20px;
     background: var(--hud-bg);
-    border: 2px solid var(--neon-green);
-    box-shadow: 0 0 20px var(--neon-green);
-    border-radius: 10px;
-    z-index: 2100;
+    border: 1px solid #00ccff;
+    box-shadow: 0 0 15px #00ccff, inset 0 0 5px #00ccff;
+    border-radius: 5px;
+    color: #00ccff;
 }
-
-.mode3-hud-item {
-    text-align: center;
-}
-
-.mode3-hud-item .label {
-    font-size: 0.7em;
-    opacity: 0.9;
-    font-family: var(--font-primary);
-    display: block;
-    color: var(--neon-green);
-}
-
-.mode3-hud-item .value {
-    font-size: 1.8em;
-    font-weight: 700;
-    font-family: var(--font-primary);
-    text-shadow: 0 0 5px var(--neon-green);
-    letter-spacing: 2px;
-    color: var(--neon-green);
-}
-
-.end-mode3-btn {
-    position: absolute;
-    bottom: 30px;
-    padding: 12px 30px;
-    font-size: 0.9em;
-    z-index: 2100;
-}
-
-/* Contrôles info */
+.mode3-hud-item .label { color: #00ccff; }
+.mode3-hud-item .value { color: #fff; }
 #mode3-game-area::after {
     content: 'CONTRÔLES: ZQSD ou Flèches pour bouger | Souris pour viser | Clic pour tirer';
     position: absolute;
@@ -397,8 +339,117 @@ button:hover {
     font-family: var(--font-primary);
     text-align: center;
 }
+.end-mode3-btn, .end-mode4-btn {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+}
 
-/* 6. POPUP NIRD */
+/* 6. MODE 4: PROGRESSION TOWER (Plateformer) */
+#mode4-game-area {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    flex-direction: column;
+}
+#mode4-canvas {
+    border: 4px solid #9d4edd;
+    box-shadow: 0 0 30px #9d4edd, inset 0 0 15px #c77dff;
+    background-color: var(--primary-bg);
+    margin-bottom: 20px;
+    cursor: default;
+}
+#mode4-hud {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 30px;
+    padding: 10px 20px;
+    background: var(--hud-bg);
+    border: 1px solid #c77dff;
+    box-shadow: 0 0 15px #c77dff, inset 0 0 5px #c77dff;
+    border-radius: 5px;
+    color: #c77dff;
+}
+.mode4-hud-item .label { color: #c77dff; }
+.mode4-hud-item .value { 
+    color: #fff; 
+    text-shadow: 0 0 5px #c77dff;
+}
+.mode4-health .value {
+    color: #ff3366;
+    text-shadow: none;
+    font-size: 1.5em;
+}
+
+/* Overlay de Fin de Niveau Mode 4 */
+.level-complete-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.level-complete-content {
+    background: var(--hud-bg);
+    border: 3px solid #c77dff;
+    box-shadow: 0 0 40px #9d4edd;
+    border-radius: 15px;
+    padding: 40px;
+    max-width: 600px;
+    text-align: center;
+    animation: popupAppear 0.3s ease-out;
+}
+.level-complete-content h2 {
+    color: #c77dff;
+    font-family: var(--font-primary);
+    font-size: 3em;
+    margin-bottom: 20px;
+    text-shadow: 0 0 15px #c77dff;
+}
+.level-complete-content p {
+    color: #fff;
+    font-size: 1.2em;
+    line-height: 1.6;
+    margin-bottom: 30px;
+    max-width: 500px;
+}
+.level-complete-content button {
+    background: linear-gradient(135deg, #9d4edd, #c77dff);
+    box-shadow: 0 0 15px #9d4edd;
+}
+.level-complete-content button:hover {
+    background: linear-gradient(135deg, #c77dff, #e0aaff);
+    box-shadow: 0 0 30px #c77dff;
+}
+
+/* Contrôles info Mode 4 */
+#mode4-game-area::after {
+    content: 'CONTRÔLES: ZQSD/Flèches pour bouger | Z/Flèche HAUT pour sauter | ESPACE pour tirer | Évitez les obstacles !';
+    position: absolute;
+    bottom: 80px;
+    font-size: 0.9em;
+    color: rgba(199, 125, 255, 0.6);
+    font-family: var(--font-primary);
+    text-align: center;
+}
+
+/* 7. POPUP NIRD */
 #nird-popup {
     position: fixed;
     top: 0;
@@ -411,11 +462,7 @@ button:hover {
     align-items: center;
     justify-content: center;
 }
-
-#nird-popup.hidden {
-    display: none;
-}
-
+#nird-popup.hidden { display: none; }
 .popup-content {
     background: var(--hud-bg);
     border: 3px solid var(--neon-green);
@@ -426,194 +473,103 @@ button:hover {
     text-align: center;
     animation: popupAppear 0.3s ease-out;
 }
-
 @keyframes popupAppear {
-    from {
-        opacity: 0;
-        transform: scale(0.8);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1); }
 }
-
 .popup-content h3 {
     color: var(--neon-green);
     font-family: var(--font-primary);
     font-size: 2em;
     margin-bottom: 20px;
-    text-shadow: 0 0 10px var(--neon-green);
 }
-
 .popup-content p {
     color: #fff;
-    font-size: 1.1em;
     line-height: 1.6;
     margin-bottom: 30px;
 }
 
-.popup-content button {
-    margin-top: 0;
-}
-
-/* ==================================== */
-/* 7. RESPONSIVE */
-/* ==================================== */
-
-/* MODE 4: Progression Tower */
-#mode4-game-area {
+/* 8. QUIZ NIRD */
+#nird-quiz-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: var(--primary-bg);
-    z-index: 2000;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-#mode4-game-area.hidden {
-    display: none;
-}
-
-#mode4-canvas {
-    border: 3px solid #9d4edd;
-    box-shadow: 0 0 30px #9d4edd, inset 0 0 20px rgba(157, 78, 221, 0.1);
-    border-radius: 10px;
-    cursor: crosshair;
-}
-
-#mode4-hud {
-    position: absolute;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 25px;
-    padding: 15px 30px;
-    background: var(--hud-bg);
-    border: 2px solid #9d4edd;
-    box-shadow: 0 0 20px #9d4edd;
-    border-radius: 10px;
-    z-index: 2100;
-}
-
-.mode4-hud-item {
-    text-align: center;
-}
-
-.mode4-hud-item .label {
-    font-size: 0.65em;
-    opacity: 0.9;
-    font-family: var(--font-primary);
-    display: block;
-    color: #c77dff;
-}
-
-.mode4-hud-item .value {
-    font-size: 1.6em;
-    font-weight: 700;
-    font-family: var(--font-primary);
-    text-shadow: 0 0 5px #c77dff;
-    letter-spacing: 2px;
-    color: #c77dff;
-}
-
-#mode4-level-complete {
-    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.9);
-    z-index: 2200;
+    background: rgba(3, 3, 18, 0.98);
+    z-index: 6500;
     display: flex;
     align-items: center;
     justify-content: center;
 }
-
-#mode4-level-complete.hidden {
-    display: none;
-}
-
-.level-complete-content {
+.quiz-container {
     background: var(--hud-bg);
-    border: 3px solid #9d4edd;
-    box-shadow: 0 0 40px #9d4edd;
-    border-radius: 15px;
+    border: 5px solid var(--neon-green);
+    box-shadow: 0 0 50px var(--neon-green);
+    border-radius: 10px;
     padding: 50px;
+    max-width: 700px;
     text-align: center;
-    animation: popupAppear 0.4s ease-out;
 }
-
-.level-complete-content h2 {
-    color: #c77dff;
+.quiz-container h3 {
     font-family: var(--font-primary);
-    font-size: 3em;
-    margin-bottom: 20px;
-    text-shadow: 0 0 15px #c77dff;
+    font-size: 1.5em;
+    margin-bottom: 25px;
+    color: var(--neon-green);
 }
-
-.level-complete-content p {
-    color: #fff;
-    font-size: 1.2em;
-    line-height: 1.6;
+.quiz-question {
+    font-size: 1.3em;
     margin-bottom: 30px;
-    max-width: 500px;
+    color: #fff;
 }
-
-.level-complete-content button {
-    background: linear-gradient(135deg, #9d4edd, #c77dff);
-    box-shadow: 0 0 15px #9d4edd;
+.quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
-
-.level-complete-content button:hover {
-    background: linear-gradient(135deg, #c77dff, #e0aaff);
-    box-shadow: 0 0 30px #c77dff;
+.quiz-option-btn {
+    background: var(--primary-bg);
+    border: 1px solid var(--neon-green);
+    color: var(--neon-green);
+    padding: 15px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+    font-family: var(--font-secondary);
 }
-
-/* Contrôles info Mode 4 */
-#mode4-game-area::after {
-    content: 'CONTRÔLES: ZQSD/Flèches pour bouger | ESPACE pour tirer | Évitez les obstacles !';
-    position: absolute;
-    bottom: 80px;
-    font-size: 0.9em;
-    color: rgba(199, 125, 255, 0.6);
-    font-family: var(--font-primary);
-    text-align: center;
+.quiz-option-btn:hover:not(:disabled) {
+    background: rgba(0, 255, 200, 0.2);
+    box-shadow: 0 0 10px var(--neon-green);
 }
-
-@media (max-width: 900px) {
-    #mode3-canvas, #mode4-canvas {
-        width: 90vw !important;
-        height: auto !important;
-    }
-    
-    #mode3-hud, #mode4-hud {
-        gap: 15px;
-        padding: 10px 20px;
-    }
-    
-    .mode3-hud-item .value, .mode4-hud-item .value {
-        font-size: 1.4em;
-    }
-    
-    .mode-selector {
-        flex-direction: column;
-        gap: 15px;
-    }
-    
-    .mode-btn {
-        width: 90%;
-        max-width: 300px;
-    }
-    
-    #mode4-game-area::after {
-        font-size: 0.7em;
-        bottom: 70px;
-    }
+.quiz-option-btn.correct-answer {
+    background: rgba(0, 255, 0, 0.4);
+    border-color: #0f0;
+    box-shadow: 0 0 15px #0f0;
+    color: #fff;
+}
+.quiz-option-btn.wrong-answer {
+    background: rgba(255, 0, 0, 0.4);
+    border-color: var(--neon-red);
+    color: #fff;
+}
+.quiz-feedback {
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 1.1em;
+}
+.quiz-feedback.success {
+    background-color: rgba(0, 255, 0, 0.1);
+    color: var(--neon-green);
+    border: 1px solid var(--neon-green);
+}
+.quiz-feedback.error {
+    background-color: rgba(255, 0, 0, 0.1);
+    color: var(--neon-red);
+    border: 1px solid var(--neon-red);
+}
+#quiz-next-btn {
+    margin-top: 30px;
 }

@@ -1,4 +1,3 @@
-
 // CONFIGURATION DU JEU
 const GAME_DURATION = 180; // 3 minutes en secondes
 const MAX_HEALTH = 100;
@@ -33,10 +32,10 @@ const NIRD_QUIZ = [
     {
         question: "Pour faire face au Goliath du numérique, quelle est la première arme d'un bon Agent NIRD ?",
         options: [
-            "Le Démineur 💣 (on sait jamais)",
+            "Le Démineur (on sait jamais)",
             "L'esprit critique et l'analyse des sources (la base!)",
-            "Un casque en alu pour bloquer les ondes 👽",
-            "Des Bitcoins, beaucoup de Bitcoins 💰"
+            "Un casque en alu pour bloquer les ondes",
+            "Des Bitcoins, beaucoup de Bitcoins"
         ],
         correctAnswer: 1,
         explanation: "Réponse B: L'esprit critique est votre bouclier le plus efficace. Le casque en alu, c'est pour les jours de grand soleil.",
@@ -45,10 +44,10 @@ const NIRD_QUIZ = [
     {
         question: "Face à une info douteuse, l'Agent NIRD doit la partager immédiatement pour alerter tout le monde. Vrai ou Faux ?",
         options: [
-            "Vrai. La vitesse est vitale, c'est le Net, pas l'escargot 🐌",
-            "Faux. Il faut toujours vérifier la source (au moins trois fois!) 🕵️‍♀️",
-            "Vrai, mais seulement si elle vient d'un groupe Facebook de mamans de chats 🐱",
-            "Faux. Je la mets sur TikTok en mode 'Ceci n'est pas un conseil financier' pour la blague 🤣"
+            "Vrai. La vitesse est vitale, c'est le Net, pas l'escargot",
+            "Faux. Il faut toujours vérifier la source (au moins trois fois!) ",
+            "Vrai, mais seulement si elle vient d'un groupe Facebook de mamans de chats",
+            "Faux. Je la mets sur TikTok en mode 'Ceci n'est pas un conseil financier' pour la blague"
         ],
         correctAnswer: 1,
         explanation: "Réponse B: La mission NIRD, c'est de l'info de qualité ! On vérifie la source avant de propager n'importe quoi. Les mamans de chats, elles, sont souvent fiables. Mais pas sur l'actu.",
@@ -58,9 +57,9 @@ const NIRD_QUIZ = [
         question: "Le 'Fact-Checking', c'est quoi exactement pour l'Agent NIRD ?",
         options: [
             "C'est un check-up médical pour les faits divers. 🩺",
-            "C'est l'art de vérifier si les données ou les affirmations sont exactes. ✔️",
-            "C'est compter les 'likes' pour savoir si l'info est populaire. 👍",
-            "C'est une nouvelle danse de salon très tendance. 💃"
+            "C'est l'art de vérifier si les données ou les affirmations sont exactes.",
+            "C'est compter les 'likes' pour savoir si l'info est populaire.",
+            "C'est une nouvelle danse de salon très tendance. ="
         ],
         correctAnswer: 1,
         explanation: "Réponse B: Le Fact-Checking, c'est le super-pouvoir NIRD pour démasquer les mythes numériques. Pas une danse, désolé les danseurs ! ",
@@ -817,9 +816,11 @@ const MODE4_CONFIG = {
     BULLET_SPEED: 10,
     BULLET_SIZE: 8,
     ENEMY_SIZE: 30,
+    LOOT_SIZE: 20, // [MODIF JEU LUDIQUE] Nouvelle taille pour les loots
     PLATFORM_HEIGHT: 20,
     JUMP_FORCE: 12,
     GRAVITY: 0.5,
+    LOOT_SPAWN_RATE: 450 // [MODIF JEU LUDIQUE] Taux d'apparition des loots (frames)
 };
 
 const MODE4_LEVELS = [
@@ -861,7 +862,7 @@ const MODE4_LEVELS = [
         objective: 30,
         enemySpeed: 2.5,
         enemySpawnRate: 80,
-        message: "🏆 FÉLICITATIONS ! Vous êtes un Maître du NIRD ! Votre progression est exemplaire !"
+        message: "FÉLICITATIONS ! Vous êtes un Maître du NIRD ! Votre progression est exemplaire !"
     }
 ];
 
@@ -880,13 +881,15 @@ let mode4State = {
     bullets: [],
     enemies: [],
     platforms: [],
+    loots: [], // [MODIF JEU LUDIQUE] Ajout du tableau pour les loots
     score: 0,
     level: 1,
     lives: 3,
     killsThisLevel: 0,
     frameCount: 0,
     animationId: null,
-    isPaused: false
+    isPaused: false,
+    hasReachedTop: false // [MODIF JEU LUDIQUE] Indicateur de succès
 };
 
 function startMode4Game() {
@@ -927,18 +930,21 @@ function initMode4Level() {
     mode4State.keys = {};
     mode4State.bullets = [];
     mode4State.enemies = [];
+    mode4State.loots = []; // [MODIF JEU LUDIQUE]
     mode4State.frameCount = 0;
     mode4State.killsThisLevel = 0;
     mode4State.isPaused = false;
+    mode4State.hasReachedTop = false; // [MODIF JEU LUDIQUE]
     
     // Créer les plateformes
     mode4State.platforms = [
-        { x: 0, y: MODE4_CONFIG.CANVAS_HEIGHT - 50, width: MODE4_CONFIG.CANVAS_WIDTH, height: 50 },
+        { x: 0, y: MODE4_CONFIG.CANVAS_HEIGHT - 50, width: MODE4_CONFIG.CANVAS_WIDTH, height: 50 }, // Sol
         { x: 150, y: 550, width: 200, height: MODE4_CONFIG.PLATFORM_HEIGHT },
         { x: 450, y: 450, width: 200, height: MODE4_CONFIG.PLATFORM_HEIGHT },
         { x: 100, y: 350, width: 150, height: MODE4_CONFIG.PLATFORM_HEIGHT },
         { x: 550, y: 300, width: 180, height: MODE4_CONFIG.PLATFORM_HEIGHT },
-        { x: 300, y: 200, width: 250, height: MODE4_CONFIG.PLATFORM_HEIGHT }
+        { x: 300, y: 200, width: 250, height: MODE4_CONFIG.PLATFORM_HEIGHT },
+        { x: 50, y: 100, width: 150, height: MODE4_CONFIG.PLATFORM_HEIGHT } // Plateforme supérieure
     ];
     
     updateMode4HUD();
@@ -983,12 +989,49 @@ function mode4Shoot() {
     }
 }
 
+function spawnMode4Loot() { // [MODIF JEU LUDIQUE] Nouvelle fonction pour faire apparaître un loot
+    const randomPlatform = mode4State.platforms[Math.floor(Math.random() * mode4State.platforms.length)];
+    
+    const loot = {
+        x: randomPlatform.x + Math.random() * randomPlatform.width,
+        y: randomPlatform.y - MODE4_CONFIG.LOOT_SIZE,
+        pulse: 0
+    };
+    
+    mode4State.loots.push(loot);
+}
+
+function successTowerComplete() { // [MODIF JEU LUDIQUE] Nouvelle fonction de succès
+    mode4State.isPaused = true;
+    cancelAnimationFrame(mode4State.animationId);
+
+    const successOverlay = document.getElementById('mode4-level-complete');
+    document.getElementById('level-complete-title').textContent = "SUCCÈS: SOMMET DE LA TOUR NIRD !";
+    document.getElementById('level-complete-message').textContent = "Votre progression a atteint de nouveaux sommets. Vous avez assimilé la philosophie NIRD. Mission accomplie !";
+    document.getElementById('level-complete-score').textContent = `Score total: ${mode4State.score}`;
+    
+    // Remplacer le bouton "Niveau Suivant" par "Nouvelle Mission" ou équivalent
+    const nextBtn = document.querySelector('#mode4-level-complete button[onclick="nextLevel()"]');
+    if (nextBtn) {
+        nextBtn.textContent = "TERMINER LA MISSION (Classement)";
+        nextBtn.onclick = endMode4Game; // Dirige vers le classement final
+    }
+    
+    successOverlay.classList.remove('hidden');
+    mode4State.hasReachedTop = true;
+}
+
 function mode4GameLoop() {
     if (!isGameRunning) return;
     
     if (!mode4State.isPaused) {
         mode4State.frameCount++;
         
+        // [MODIF JEU LUDIQUE] Condition de Succès (atteindre le haut)
+        if (mode4State.player.y < 50 && !mode4State.hasReachedTop) {
+            successTowerComplete();
+        }
+
         // Déplacer le joueur
         let dx = 0;
         if (mode4State.keys['q'] || mode4State.keys['arrowleft']) {
@@ -1026,6 +1069,37 @@ function mode4GameLoop() {
                 mode4State.player.onGround = true;
             }
         });
+
+        // [MODIF JEU LUDIQUE] Spawn loots
+        if (mode4State.frameCount % MODE4_CONFIG.LOOT_SPAWN_RATE === 0) {
+            spawnMode4Loot();
+        }
+
+        // [MODIF JEU LUDIQUE] Collision joueur-loots
+        mode4State.loots = mode4State.loots.filter(loot => {
+            const dx = mode4State.player.x - loot.x;
+            const dy = mode4State.player.y - loot.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            
+            // Le joueur est une boîte (taille joueur) et le loot est un cercle (taille loot)
+            const playerCenter = {
+                x: mode4State.player.x + MODE4_CONFIG.PLAYER_SIZE / 2,
+                y: mode4State.player.y + MODE4_CONFIG.PLAYER_SIZE / 2
+            };
+            
+            if (playerCenter.x > loot.x - MODE4_CONFIG.LOOT_SIZE &&
+                playerCenter.x < loot.x + MODE4_CONFIG.LOOT_SIZE &&
+                playerCenter.y > loot.y - MODE4_CONFIG.LOOT_SIZE &&
+                playerCenter.y < loot.y + MODE4_CONFIG.LOOT_SIZE) {
+                
+                showNirdTip(); // Afficher le pop-up de Conseil NIRD
+                mode4State.score += 50; // Points pour la collecte
+                updateMode4HUD();
+                return false; // Supprimer le loot
+            }
+            return true;
+        });
+
         
         // Spawn ennemis
         const currentLevel = MODE4_LEVELS[mode4State.level - 1];
@@ -1162,6 +1236,25 @@ function mode4Draw() {
         ctx.lineWidth = 2;
         ctx.strokeRect(platform.x, platform.y, platform.width, platform.height);
     });
+
+    // [MODIF JEU LUDIQUE] Dessiner les Loots (Conseils NIRD)
+    mode4State.loots.forEach(loot => {
+        loot.pulse += 0.1;
+        const size = MODE4_CONFIG.LOOT_SIZE + Math.sin(loot.pulse) * 5;
+        
+        ctx.fillStyle = '#FFD700'; // Jaune or
+        ctx.shadowColor = '#FFD700';
+        ctx.shadowBlur = 15;
+        ctx.beginPath();
+        ctx.arc(loot.x, loot.y, size / 2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 16px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('💡', loot.x, loot.y + 6); // Symbole d'ampoule
+    });
     
     // Ennemis
     mode4State.enemies.forEach(enemy => {
@@ -1215,13 +1308,31 @@ function updateMode4HUD() {
 
 function completeLevel() {
     mode4State.isPaused = true;
+    cancelAnimationFrame(mode4State.animationId);
+
+    // Modification précédente : Logique pour insérer le quiz après le niveau 1
+    if (mode4State.level === 1 && currentQuizIndex === -1) {
+        showNirdQuiz();
+        return; 
+    }
+
     const currentLevel = MODE4_LEVELS[mode4State.level - 1];
     
     const overlay = document.getElementById('mode4-level-complete');
     const message = document.getElementById('level-complete-message');
     
+    document.getElementById('level-complete-title').textContent = `NIVEAU ${mode4State.level} ACCOMPLI !`;
+    document.getElementById('level-complete-score').textContent = `Score actuel: ${mode4State.score}`;
+
     message.textContent = currentLevel.message;
     overlay.classList.remove('hidden');
+
+    // [MODIF JEU LUDIQUE] Remettre le bouton de base si ce n'est pas le succès de la tour
+    const nextBtn = document.querySelector('#mode4-level-complete button[onclick="nextLevel()"]');
+    if (nextBtn) {
+        nextBtn.textContent = "NIVEAU SUIVANT";
+        nextBtn.onclick = nextLevel;
+    }
 }
 
 function nextLevel() {
@@ -1251,11 +1362,10 @@ function levelComplete() {
     isGameRunning = false;
     cancelAnimationFrame(mode4State.animationId);
 
-    // Ajout du Quiz après le NIVEAU 1
+    // L'ancienne logique du quiz était ici, mais elle est maintenant dans completeLevel.
     if (mode4State.level === 1 && currentQuizIndex === -1) {
-        // Si c'est le niveau 1 et que le quiz n'a jamais été fait
         showNirdQuiz();
-        return; // Stoppe la progression du niveau pour faire le quiz
+        return; 
     }
 
 

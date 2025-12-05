@@ -31,7 +31,6 @@
     <div id="game-area">
     </div>
     
-    <!-- MODE 3: Laser Game Top-Down -->
     <div id="mode3-game-area" class="hidden">
         <canvas id="mode3-canvas"></canvas>
         <div id="mode3-hud">
@@ -50,7 +49,6 @@
         </div>
     </div>
 
-    <!-- MODE 4: Progression Tower -->
     <div id="mode4-game-area" class="hidden">
         <canvas id="mode4-canvas"></canvas>
         <div id="mode4-hud">
@@ -59,39 +57,50 @@
                 <span id="mode4-level" class="value">01</span>
             </div>
             <div class="mode4-hud-item">
-                <span class="label">SCORE</span>
+                <span class="label">SCORE NIRD</span>
                 <span id="mode4-score" class="value">00000</span>
             </div>
-            <div class="mode4-hud-item">
+            <div class="mode4-hud-item mode4-health">
                 <span class="label">VIES</span>
-                <span id="mode4-lives" class="value">❤️❤️❤️</span>
+                <span id="mode4-lives" class="value">💖💖💖</span>
             </div>
             <div class="mode4-hud-item">
                 <span class="label">OBJECTIF</span>
-                <span id="mode4-objective" class="value">0/10</span>
+                <span id="mode4-objective" class="value">00</span>
             </div>
         </div>
-        <div id="mode4-level-complete" class="hidden">
+
+        <div id="mode4-level-complete" class="level-complete-overlay hidden">
             <div class="level-complete-content">
-                <h2>🎉 NIVEAU COMPLÉTÉ !</h2>
-                <p id="level-complete-message"></p>
-                <button onclick="nextLevel()">NIVEAU SUIVANT ➜</button>
+                <h2 id="level-complete-title">NIVEAU ACCOMPLI !</h2>
+                <p id="level-complete-score">Score actuel: 00000</p>
+                <p id="level-complete-message">Bien joué ! Continuez votre progression vers le sommet de la Tour NIRD.</p>
+                <button onclick="nextLevel()">NIVEAU SUIVANT</button>
             </div>
         </div>
     </div>
 
-    <!-- Popup d'information NIRD -->
+
     <div id="nird-popup" class="hidden">
         <div class="popup-content">
-            <h3 id="popup-title">Pratique NIRD</h3>
-            <p id="popup-text"></p>
-            <button onclick="closeNirdPopup()">Compris !</button>
+            <h3 id="popup-title">TITRE</h3>
+            <p id="popup-text">MESSAGE</p>
+            <button onclick="closeNirdPopup()">CONTINUER LA MISSION</button>
         </div>
+    </div>
+
+    <div id="nird-quiz-overlay" class="hidden">
+        <div id="quiz-content" class="quiz-container">
+            </div>
     </div>
 
     <div id="message-overlay">
-        <h1>[MISSION NIRD] LA ZERGUÈM DE LA NUIT</h1>
-        <p>Le Numérique Éphémère tente de brouiller le signal NIRD. Détruisez les concepts clés (+10) et éliminez les drones ennemis (+25) avant qu'ils ne vous touchent (-30) !</p>
+        <h1>LA ZERGUÈM DE LA NUIT</h1>
+        <p>
+            Bienvenue, Agent NIRD (Numérique, Information, Réflexion, Décision). Votre mission : 
+            renforcer votre esprit critique face aux menaces numériques (désinformation, pièges).
+            Choisissez votre mode d'entraînement pour commencer.
+        </p>
         <div class="mode-selector">
             <button onclick="startGame(1)" class="mode-btn">MODE 1: CLASSIQUE</button>
             <button onclick="startGame(2)" class="mode-btn">MODE 2: SURVIE</button>
@@ -120,12 +129,11 @@
     </div>
 
     
-
-
     <audio id="sound-hit" src="game-over-arcade-6435.mp3" preload="auto"></audio>
     <audio id="sound-miss" src="arcade-ui-1-229498.mp3" preload="auto"></audio>
-    <audio id="sound-pain" src="retro-game-jingleaif-14638.mp3" preload="auto"></audio>
-    
+    <audio id="sound-pain" src="game-over-arcade-6435.mp3" preload="auto"></audio>
+    <audio id="sound-jingle" src="retro-game-jingleaif-14638.mp3" preload="auto"></audio>
+
     <script src="script.js"></script>
 </body>
 </html>
