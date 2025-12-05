@@ -199,6 +199,7 @@
 
             try {
                 const response = await fetch('index.php?controller=chatbot&action=send&ajax=1', {
+                
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: 'message=' + encodeURIComponent(message)
@@ -208,7 +209,7 @@
                 let i = 0;
                 const messageDiv = botMessageDiv.querySelector('.bot-message');
 
-                const tickSound = new Audio('"public/assets/sounds/animal-crossing.mp3');
+                const tickSound = new Audio('public/assets/sounds/animal-crossing.mp3');
                 tickSound.volume = 0.5;
                 tickSound.loop = true;
 

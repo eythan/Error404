@@ -1,4 +1,3 @@
-/* style.css */
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=VT323&display=swap');
 * {
     margin: 0;
@@ -45,23 +44,23 @@ header {
     position: relative;
     padding: 6px 20px;
     transition: 0.1s;
-    display: inline-block; /* Ensures the <a> tag respects padding and positioning */
+    display: inline-block;
 }
 
 .nav-links ul li a span {
     position: absolute;
-    bottom: 0; /* Aligns the border to the bottom */
+    bottom: 0;
     left: 0;
     width: 100%;
-    height: 2px; /* Adjust height for the border effect */
-    background: magenta; /* Use background instead of border for smoother animation */
-    transform: scaleX(0); /* Start with zero width */
-    transform-origin: right; /* Animate from right to left */
+    height: 2px;
+    background: magenta;
+    transform: scaleX(0);
+    transform-origin: right;
     transition: transform 0.5s ease;
 }
 
 .nav-links ul li a:hover span {
-    transform: scaleX(1); /* Animate to full width */
+    transform: scaleX(1);
     transform-origin: left;
 }
 
@@ -117,8 +116,8 @@ header {
     left: 0;
     width: 100%;
     height: 100%;
-    pointer-events: none; /* Let clicking pass through if needed */
-    z-index: 5; /* ABOVE the canvas */
+    pointer-events: none;
+    z-index: 5;
 }
 
 .orbit-btn {

@@ -3,7 +3,6 @@ require 'models/GeminiModel.php';
 
 $action = $_GET['action'] ?? 'index';
 
-// Réinitialiser l'historique si c'est un rechargement (F5)
 if ($action === 'index' && !isset($_SESSION['chat_initialized'])) {
     $_SESSION['chat_history'] = [];
     $_SESSION['chat_initialized'] = true;
@@ -24,10 +23,8 @@ if ($action === 'send') {
         }
 
         if ($userMessage) {
-            // Ajouter le message de l'utilisateur à l'historique
             $_SESSION['chat_history'][] = ["role" => "user", "message" => $userMessage];
 
-            // Construire le prompt avec l'historique actuel
             $historyPrompt = "";
             foreach ($_SESSION['chat_history'] as $entry) {
                 $role = $entry['role'] === 'user' ? "Utilisateur" : "PhiloBidon";
@@ -53,7 +50,6 @@ PROMPT;
 
             if (!empty($response['candidates'][0]['content']['parts'][0]['text'])) {
                 $answer = $response['candidates'][0]['content']['parts'][0]['text'];
-                // Ajouter la réponse de PhiloBidon à l'historique
                 $_SESSION['chat_history'][] = ["role" => "assistant", "message" => $answer];
             } elseif (!empty($response['error'])) {
                 $err = is_array($response['error']) ? json_encode($response['error']) : $response['error'];
