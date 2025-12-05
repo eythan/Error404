@@ -7,47 +7,71 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=VT323&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="views/hiddensnake/styleGlobal.css">
     <style>
-    /* Barre de progression verticale */
-    #scroll-progress {
-        position: fixed;
-        right: 20px;
-        top: 0;
-        width: 8px;
+    html, body {
+        height: 100%;
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+    body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        width: 100vw;
+    }
+    .container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 0;
         height: 100vh;
-        background: rgba(255,255,255,0.08);
-        z-index: 9999;
-        border-radius: 4px;
+        box-sizing: border-box;
+        overflow: hidden;
     }
-    #scroll-progress-bar {
-        width: 100%;
-        background: linear-gradient(180deg,#bc13fe,#0aff0a);
-        border-radius: 4px;
-        height: 0;
-        transition: height 0.2s;
-    }
-    /* Boucle temporelle overlay */
-    #time-loop-overlay {
-        display: none;
+    #game-overlay {
         position: fixed;
-        top: 0; left: 0; width: 100vw; height: 100vh;
+        top: 0; left: 0;
+        width: 100vw;
+        height: 100vh;
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
         background: rgba(44,0,80,0.85);
-        z-index: 10000;
-        color: #fff;
-        font-family: 'Orbitron', monospace;
-        font-size: 2.2rem;
-        text-align: center;
-        padding-top: 20vh;
-        animation: glitch 0.2s infinite;
+        z-index: 1000;
     }
-    @keyframes glitch {
-        0% { text-shadow: 2px 0 #bc13fe, -2px 0 #0aff0a; }
-        50% { text-shadow: -2px 0 #bc13fe, 2px 0 #0aff0a; }
-        100% { text-shadow: 2px 0 #bc13fe, -2px 0 #0aff0a; }
+    #game-ui {
+        margin-bottom: 10px;
+    }
+    #snakeCanvas {
+        max-width: 90vw;
+        max-height: 60vh;
+        width: 400px;
+        height: 400px;
+        background: #050510;
+        border-radius: 8px;
+        box-shadow: 0 0 20px #bc13fe44;
+    }
+    @media (max-width: 600px) {
+        #snakeCanvas {
+            width: 90vw;
+            height: 50vw;
+            max-width: 90vw;
+            max-height: 50vw;
+        }
+        .container {
+            padding: 10px;
+        }
     }
     </style>
 </head>
 <body>
-    <?php include __DIR__ . '/hiddensnake/layouts/header.php'; ?>
+    <?php include __DIR__ . '/layouts/header.php'; ?>
+    <?php include __DIR__ . '/chatbot/index.php'; ?>
     <div class="container">
         <h2>NIRD - Résistance Numérique</h2>
         <p>
@@ -68,10 +92,6 @@
             </p>
         </div>
     </div>
-    <div id="scroll-progress">
-        <div id="scroll-progress-bar"></div>
-    </div>
-    <div id="time-loop-overlay">BOUCLE TEMPORELLE !<br>Vous scrollez trop vite dans le continuum numérique...</div>
     <div id="game-overlay" style="display:none;">
         <div id="game-ui">
             <div id="game-title">SYSTEM HACKED: SNAKE PROTOCOL</div>
@@ -265,99 +285,7 @@ if (canvas && ctx) {
 } else {
     console.error("Canvas element not found for Snake game initialization.");
 }
-
-// --- SCROLL INFINI + BOUCLE TEMPORELLE + BARRE DE PROGRESSION ---
-let lastScroll = Date.now();
-let lastScrollTop = 0;
-let scrollSpeeds = [];
-let timeLoopActive = false;
-let fakeContentCount = 0;
-let wheelScrollAmount = 0;
-let wheelStartTime = null;
-
-function addFakeContent() {
-    const container = document.querySelector('.container');
-    if (container) {
-        for (let i = 0; i < 3; i++) {
-            const p = document.createElement('p');
-            p.innerHTML = `<span style='color:#bc13fe'>[${++fakeContentCount}]</span> Contenu temporel généré...`;
-            container.appendChild(p);
-        }
-    }
-}
-
-window.addEventListener('DOMContentLoaded', () => {
-    // Ajoute du contenu fictif au chargement pour permettre le scroll
-    addFakeContent();
-    addFakeContent();
-    lastScrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-});
-
-window.addEventListener('scroll', () => {
-    // Barre de progression
-    const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-    const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-    const percent = scrollHeight > 0 ? (scrollTop / scrollHeight) : 0;
-    document.getElementById('scroll-progress-bar').style.height = (percent * 100) + '%';
-
-    // Scroll infini
-    if (window.innerHeight + scrollTop >= document.documentElement.scrollHeight - 10) {
-        addFakeContent();
-    }
-
-    // Boucle temporelle si scroll trop rapide
-    const now = Date.now();
-    const deltaTime = now - lastScroll;
-    const deltaScroll = Math.abs(scrollTop - lastScrollTop);
-    lastScroll = now;
-    lastScrollTop = scrollTop;
-    // pixels par seconde
-    const speed = deltaScroll / (deltaTime / 1000);
-    scrollSpeeds.push(speed);
-    if (scrollSpeeds.length > 10) scrollSpeeds.shift();
-    const avgSpeed = scrollSpeeds.reduce((a,b)=>a+b,0)/scrollSpeeds.length;
-    if (avgSpeed > 2600 && !timeLoopActive) { // plus de 2600px/sec
-        timeLoopActive = true;
-        window.scrollTo({top:0,behavior:'smooth'});
-        setTimeout(()=>{
-            document.getElementById('time-loop-overlay').style.display = 'block';
-            setTimeout(()=>{
-                document.getElementById('time-loop-overlay').style.display = 'none';
-                timeLoopActive = false;
-                scrollSpeeds = [];
-            }, 1800);
-        }, 300); // Affiche l'effet juste après le scrollTo
-    }
-});
-
-window.addEventListener('wheel', (e) => {
-    const now = Date.now();
-    if (!wheelStartTime) {
-        wheelStartTime = now;
-        wheelScrollAmount = 0;
-    }
-    wheelScrollAmount += Math.abs(e.deltaY);
-    const elapsed = now - wheelStartTime;
-    if (elapsed > 1000) {
-        wheelStartTime = now;
-        wheelScrollAmount = Math.abs(e.deltaY);
-    }
-    const limit = window.innerHeight * 1.5;
-    if (wheelScrollAmount > 2600 && !timeLoopActive) {
-        timeLoopActive = true;
-        window.scrollTo({top:0,behavior:'smooth'});
-        setTimeout(()=>{
-            document.getElementById('time-loop-overlay').style.display = 'block';
-            setTimeout(()=>{
-                document.getElementById('time-loop-overlay').style.display = 'none';
-                timeLoopActive = false;
-                wheelScrollAmount = 0;
-                wheelStartTime = null;
-            }, 1800);
-        }, 300); // Affiche l'effet juste après le scrollTo
-    }
-});
     </script>
-    <?php include __DIR__ . '/hiddensnake/layouts/footer.php'; ?>
+    <?php include __DIR__ . '/layouts/footer.php'; ?>
 </body>
 </html>
