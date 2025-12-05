@@ -83,7 +83,7 @@
     <!-- Popup d'information NIRD -->
     <div id="nird-popup" class="hidden">
         <div class="popup-content">
-            <h3 id="popup-title">Pratique NIRD</h3>
+            <h3 id="popup-title">📚 Pratique NIRD</h3>
             <p id="popup-text"></p>
             <button onclick="closeNirdPopup()">Compris !</button>
         </div>
@@ -91,12 +91,12 @@
 
     <div id="message-overlay">
         <h1>[MISSION NIRD] LA ZERGUÈM DE LA NUIT</h1>
-        <p>Le Numérique Éphémère tente de brouiller le signal NIRD. Détruisez les concepts clés (+10) et éliminez les drones ennemis (+25) avant qu'ils ne vous touchent (-30) !</p>
+        <p>Le Numérique Éphémère tente de brouiller le signal NIRD. Détruisez les concepts clés (+10) et éliminez les drones ennemis (❌, +25) avant qu'ils ne vous touchent (-30) !</p>
         <div class="mode-selector">
             <button onclick="startGame(1)" class="mode-btn">MODE 1: CLASSIQUE</button>
             <button onclick="startGame(2)" class="mode-btn">MODE 2: SURVIE</button>
-            <button onclick="startGame(3)" class="mode-btn mode-3-btn">MODE 3: LASER GAME</button>
-            <button onclick="startGame(4)" class="mode-btn mode-4-btn">MODE 4: PROGRESSION TOWER</button>
+            <button onclick="startGame(3)" class="mode-btn mode-3-btn">MODE 3: LASER GAME 🎮</button>
+            <button onclick="startGame(4)" class="mode-btn mode-4-btn">MODE 4: PROGRESSION TOWER 🗼</button>
         </div>
         <div class="instruction-note">
             <p><strong>Note:</strong> Ce jeu nécessite l'audio (Impact.mp3, Miss.mp3, Pain.mp3) pour une immersion complète.</p>
@@ -118,9 +118,9 @@
         <button onclick="window.location.reload()">NOUVELLE MISSION</button>
     </div>
 
-    <audio id="sound-hit" src="impact.mp3" preload="auto"></audio>
-    <audio id="sound-miss" src="miss.mp3" preload="auto"></audio>
-    <audio id="sound-pain" src="pain.mp3" preload="auto"></audio>
+    <audio id="sound-hit" src="game-over-arcade-6435.mp3" preload="auto"></audio>
+    <audio id="sound-miss" src="arcade-ui-1-229498.mp3" preload="auto"></audio>
+    <audio id="sound-pain" src="retro-game-jingleaif-14638.mp3" preload="auto"></audio>
     
     <script src="script.js"></script>
 </body>

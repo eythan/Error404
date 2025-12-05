@@ -1,6 +1,5 @@
-// ====================================
+
 // CONFIGURATION DU JEU
-// ====================================
 const GAME_DURATION = 180; // 3 minutes en secondes
 const MAX_HEALTH = 100;
 const NIRD_CONCEPTS = ["Progression", "Réalisme", "Motivation", "Contribuer", "Évaluer", "Comprendre"];
@@ -9,9 +8,7 @@ const POINTS_ENEMY_KILL = 25;
 const POINTS_ENEMY_DAMAGE = 30;
 const POINTS_MISS = -1;
 
-// ====================================
 // ÉTAT DU JEU
-// ====================================
 let score = 0;
 let health = MAX_HEALTH;
 let timeLeft = GAME_DURATION;
@@ -31,10 +28,50 @@ const soundHit = document.getElementById('sound-hit');
 const soundMiss = document.getElementById('sound-miss');
 const soundPain = document.getElementById('sound-pain');
 
+// QUIZ NIRD - Goliath Numérique
+const NIRD_QUIZ = [
+    {
+        question: "Pour faire face au Goliath du numérique, quelle est la première arme d'un bon Agent NIRD ?",
+        options: [
+            "Le Démineur 💣 (on sait jamais)",
+            "L'esprit critique et l'analyse des sources (la base!)",
+            "Un casque en alu pour bloquer les ondes 👽",
+            "Des Bitcoins, beaucoup de Bitcoins 💰"
+        ],
+        correctAnswer: 1,
+        explanation: "Réponse B: L'esprit critique est votre bouclier le plus efficace. Le casque en alu, c'est pour les jours de grand soleil.",
+        points: 50
+    },
+    {
+        question: "Face à une info douteuse, l'Agent NIRD doit la partager immédiatement pour alerter tout le monde. Vrai ou Faux ?",
+        options: [
+            "Vrai. La vitesse est vitale, c'est le Net, pas l'escargot 🐌",
+            "Faux. Il faut toujours vérifier la source (au moins trois fois!) 🕵️‍♀️",
+            "Vrai, mais seulement si elle vient d'un groupe Facebook de mamans de chats 🐱",
+            "Faux. Je la mets sur TikTok en mode 'Ceci n'est pas un conseil financier' pour la blague 🤣"
+        ],
+        correctAnswer: 1,
+        explanation: "Réponse B: La mission NIRD, c'est de l'info de qualité ! On vérifie la source avant de propager n'importe quoi. Les mamans de chats, elles, sont souvent fiables. Mais pas sur l'actu.",
+        points: 50
+    },
+    {
+        question: "Le 'Fact-Checking', c'est quoi exactement pour l'Agent NIRD ?",
+        options: [
+            "C'est un check-up médical pour les faits divers. 🩺",
+            "C'est l'art de vérifier si les données ou les affirmations sont exactes. ✔️",
+            "C'est compter les 'likes' pour savoir si l'info est populaire. 👍",
+            "C'est une nouvelle danse de salon très tendance. 💃"
+        ],
+        correctAnswer: 1,
+        explanation: "Réponse B: Le Fact-Checking, c'est le super-pouvoir NIRD pour démasquer les mythes numériques. Pas une danse, désolé les danseurs ! ",
+        points: 50
+    }
+];
 
-// ====================================
+let currentQuizIndex = -1;
+
+
 // FONCTIONS PRINCIPALES DU JEU
-// ====================================
 
 /** Met à jour le HUD (Score, Temps, Santé) */
 function updateHUD() {
@@ -53,6 +90,91 @@ function updateHUD() {
         motivationBar.style.backgroundColor = 'orange';
     } else {
         motivationBar.style.backgroundColor = 'var(--neon-red)';
+    }
+}
+
+// =====================================
+// FONCTIONS QUIZ NIRD
+// =====================================
+
+function showNirdQuiz() {
+    isGameRunning = false;
+    currentQuizIndex = 0;
+    const quizOverlay = document.getElementById('nird-quiz-overlay');
+    quizOverlay.classList.remove('hidden');
+    
+    // Jouer un son d'alerte/jingle si possible
+    // Si vous avez un jingle quiz (par ex: retro-game-jingleaif-14638.mp3), l'ajouter ici.
+    const soundQuiz = document.getElementById('sound-jingle');
+    if (soundQuiz) {
+        soundQuiz.play();
+    }
+
+    displayQuizQuestion();
+}
+
+function displayQuizQuestion() {
+    const quizData = NIRD_QUIZ[currentQuizIndex];
+    const quizContent = document.getElementById('quiz-content');
+
+    quizContent.innerHTML = `
+        <h3>MISSION QUIZ NIRD - Question ${currentQuizIndex + 1}/${NIRD_QUIZ.length}</h3>
+        <p class="quiz-question">${quizData.question}</p>
+        <div class="quiz-options">
+            ${quizData.options.map((option, index) => 
+                `<button onclick="checkQuizAnswer(${index})" class="quiz-option-btn">${String.fromCharCode(65 + index)}: ${option}</button>`
+            ).join('')}
+        </div>
+        <p id="quiz-feedback" class="quiz-feedback hidden"></p>
+        <button id="quiz-next-btn" class="hidden" onclick="nextQuizQuestion()">QUESTION SUIVANTE</button>
+    `;
+}
+
+function checkQuizAnswer(selectedOptionIndex) {
+    const quizData = NIRD_QUIZ[currentQuizIndex];
+    const feedbackElement = document.getElementById('quiz-feedback');
+    const nextButton = document.getElementById('quiz-next-btn');
+    const optionButtons = document.querySelectorAll('.quiz-option-btn');
+
+    // Désactiver tous les boutons pour empêcher de re-cliquer
+    optionButtons.forEach(btn => btn.disabled = true);
+
+    if (selectedOptionIndex === quizData.correctAnswer) {
+        // Bonne réponse
+        score += quizData.points;
+        updateHUD();
+        feedbackElement.textContent = `EXCELLENT! +${quizData.points} Points NIRD. ${quizData.explanation}`;
+        feedbackElement.classList.remove('error');
+        feedbackElement.classList.add('success');
+        
+        // Mettre en évidence la bonne réponse
+        optionButtons[selectedOptionIndex].classList.add('correct-answer');
+
+    } else {
+        // Mauvaise réponse
+        // Pas de perte de points, mais un petit rappel à l'ordre
+        feedbackElement.textContent = `ATTENTION AGENT! Réponse fausse. ${quizData.explanation}`;
+        feedbackElement.classList.remove('success');
+        feedbackElement.classList.add('error');
+
+        // Mettre en évidence la bonne réponse et la réponse de l'utilisateur
+        optionButtons[quizData.correctAnswer].classList.add('correct-answer');
+        optionButtons[selectedOptionIndex].classList.add('wrong-answer');
+    }
+
+    feedbackElement.classList.remove('hidden');
+    nextButton.classList.remove('hidden');
+}
+
+function nextQuizQuestion() {
+    currentQuizIndex++;
+    if (currentQuizIndex < NIRD_QUIZ.length) {
+        displayQuizQuestion();
+    } else {
+        // Quiz terminé
+        document.getElementById('nird-quiz-overlay').classList.add('hidden');
+        // Redémarrer le jeu (par exemple le mode 1)
+        startGame(currentGameMode); 
     }
 }
 
@@ -234,9 +356,7 @@ function endGame() {
     showScoreTable();
 }
 
-// ====================================
 // GESTION DES SCORES (LocalStorage)
-// ====================================
 
 function getHighScores() {
     // Structure: [{ name: "Nom", score: 12345, mode: 1 }]
@@ -282,9 +402,7 @@ function showScoreTable() {
     scoreTableOverlay.classList.remove('hidden');
 }
 
-// ====================================
 // MODE 3: LASER GAME TOP-DOWN
-// ====================================
 
 const MODE3_CONFIG = {
     CANVAS_WIDTH: 800,
@@ -303,35 +421,35 @@ const MODE3_CONFIG = {
 
 const NIRD_TIPS = [
     {
-        title: "🎯 Progression",
+        title: "Progression",
         text: "Le NIRD valorise la progression régulière plutôt que la perfection immédiate. Chaque petit pas compte !"
     },
     {
-        title: "🔍 Réalisme",
+        title: "Réalisme",
         text: "Établir des objectifs réalistes et atteignables est essentiel pour maintenir la motivation et éviter l'épuisement."
     },
     {
-        title: "💪 Motivation",
+        title: "Motivation",
         text: "La motivation intrinsèque (plaisir d'apprendre) est plus durable que la motivation extrinsèque (notes, récompenses)."
     },
     {
-        title: "🤝 Contribuer",
+        title: "Contribuer",
         text: "Contribuer activement à un projet renforce l'apprentissage et le sentiment d'appartenance à une communauté."
     },
     {
-        title: "📊 Évaluer",
+        title: "Évaluer",
         text: "L'auto-évaluation régulière permet de mieux comprendre ses forces et ses axes d'amélioration."
     },
     {
-        title: "🧠 Comprendre",
+        title: "Comprendre",
         text: "Comprendre en profondeur vaut mieux que mémoriser superficiellement. Prenez le temps d'explorer les concepts !"
     },
     {
-        title: "⚡ Efficacité",
+        title: "Efficacité",
         text: "Travailler intelligemment plutôt que longtemps : des sessions courtes et concentrées sont plus efficaces."
     },
     {
-        title: "🔄 Itération",
+        title: "Itération",
         text: "L'apprentissage est itératif : il est normal de revenir sur des concepts pour mieux les maîtriser."
     }
 ];
@@ -689,9 +807,7 @@ function endMode3Game() {
     showScoreTable();
 }
 
-// ====================================
 // MODE 4: PROGRESSION TOWER
-// ====================================
 
 const MODE4_CONFIG = {
     CANVAS_WIDTH: 900,
@@ -1129,6 +1245,23 @@ function endMode4Game() {
     
     score = mode4State.score;
     showScoreTable();
+}
+
+function levelComplete() {
+    isGameRunning = false;
+    cancelAnimationFrame(mode4State.animationId);
+
+    // Ajout du Quiz après le NIVEAU 1
+    if (mode4State.level === 1 && currentQuizIndex === -1) {
+        // Si c'est le niveau 1 et que le quiz n'a jamais été fait
+        showNirdQuiz();
+        return; // Stoppe la progression du niveau pour faire le quiz
+    }
+
+
+    document.getElementById('mode4-level-complete').classList.remove('hidden');
+    document.getElementById('level-complete-title').textContent = `NIVEAU ${mode4State.level} ACCOMPLI !`;
+    document.getElementById('level-complete-score').textContent = `Score actuel: ${mode4State.score}`;
 }
 
 // Initialisation au chargement de la page
