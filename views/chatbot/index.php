@@ -208,7 +208,7 @@
                 let i = 0;
                 const messageDiv = botMessageDiv.querySelector('.bot-message');
 
-                const tickSound = new Audio('assets/sounds/animal-crossing.mp3');
+                const tickSound = new Audio('"public/assets/sounds/animal-crossing.mp3');
                 tickSound.volume = 0.5;
                 tickSound.loop = true;
 
@@ -218,7 +218,7 @@
                         messageDiv.innerHTML += text.charAt(i);
                         i++;
                         chatBody.scrollTop = chatBody.scrollHeight;
-                        setTimeout(typeWriter, 1);
+                        setTimeout(typeWriter, 40);
                     } else {
                         tickSound.pause();
                         tickSound.currentTime = 0;

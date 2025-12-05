@@ -1,12 +1,13 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-
 require 'models/GeminiModel.php';
 
 $action = $_GET['action'] ?? 'index';
+
+// Réinitialiser l'historique si c'est un rechargement (F5)
+if ($action === 'index' && !isset($_SESSION['chat_initialized'])) {
+    $_SESSION['chat_history'] = [];
+    $_SESSION['chat_initialized'] = true;
+}
 
 if ($action === 'index') {
     require 'views/chatbot/index.php';
@@ -18,7 +19,21 @@ if ($action === 'send') {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $userMessage = $_POST['message'] ?? '';
 
+        if (!isset($_SESSION['chat_history'])) {
+            $_SESSION['chat_history'] = [];
+        }
+
         if ($userMessage) {
+            // Ajouter le message de l'utilisateur à l'historique
+            $_SESSION['chat_history'][] = ["role" => "user", "message" => $userMessage];
+
+            // Construire le prompt avec l'historique actuel
+            $historyPrompt = "";
+            foreach ($_SESSION['chat_history'] as $entry) {
+                $role = $entry['role'] === 'user' ? "Utilisateur" : "PhiloBidon";
+                $historyPrompt .= "$role : " . $entry['message'] . "\n";
+            }
+
             $prompt = <<<PROMPT
 Tu es PhiloBidon, un chatbot excentrique persuadé d’être un philosophe génial, mais complètement à côté de la plaque.
 À chaque message de l’utilisateur :
@@ -28,14 +43,18 @@ Tu es PhiloBidon, un chatbot excentrique persuadé d’être un philosophe géni
 - Sois drôle, confiant et un peu prétentieux.
 - Pose parfois une question inattendue à l’utilisateur pour relancer la conversation.
 Tes réponses doivent être courtes, percutantes et absurdes, faciles à lire rapidement.
+
+Historique de la conversation actuelle :
+$historyPrompt
 PROMPT;
 
             $fullMessage = $prompt . "\nUtilisateur : " . $userMessage;
-
             $response = askGemini($fullMessage);
 
             if (!empty($response['candidates'][0]['content']['parts'][0]['text'])) {
                 $answer = $response['candidates'][0]['content']['parts'][0]['text'];
+                // Ajouter la réponse de PhiloBidon à l'historique
+                $_SESSION['chat_history'][] = ["role" => "assistant", "message" => $answer];
             } elseif (!empty($response['error'])) {
                 $err = is_array($response['error']) ? json_encode($response['error']) : $response['error'];
                 $answer = "Erreur cosmique même les circuits électroniques ont besoin de méditer : " . $err;

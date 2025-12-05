@@ -16,7 +16,7 @@
         }
 
         body {
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Roboto', sans-serif;
             background-color: var(--bg-dark);
             color: #fff;
             margin: 0;
@@ -106,6 +106,7 @@
 <body>
     <nav class="nav-links">
         <a href="index.php?controller=main&action=index">Accueil</a>
+        <a href="index.php?controller=computer&action=index">Défi</a>
         <a href="index.php?controller=hiddensnake&action=index">Hidden Snake</a>
         <a href="index.php?controller=lazerguem&action=index">La zerguèm</a>
     </nav>

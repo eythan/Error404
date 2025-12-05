@@ -1,0 +1,323 @@
+body {
+  margin: 0;
+  background: #0b1220;
+  color: #fff;
+  overflow: hidden;
+  font-family: 'Roboto', sans-serif;
+}
+
+.computer-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(100vh - 60px);
+}
+
+.computer {
+  width: 720px;
+  max-width: 95vw;
+  transition: all 0.3s ease;
+}
+
+.computer.fullscreen {
+  width: 95vw;
+  height: 95vh;
+}
+
+.monitor {
+  background: #111316;
+  border-radius: 12px;
+  padding: 22px 22px 28px;
+  box-shadow: 0 20px 50px rgba(2, 6, 23, .7), inset 0 2px 0 rgba(255, 255, 255, .02);
+  height: 100%;
+}
+
+.screen-wrap {
+  background: #050508;
+  border-radius: 8px;
+  padding: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  height: 100%;
+}
+
+.screen {
+  width: 100%;
+  height: 360px;
+  border-radius: 6px;
+  background: #000;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 -30px 80px rgba(0, 0, 0, .6);
+  transition: filter .7s ease, box-shadow .7s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.screen.off {
+  filter: brightness(.03) contrast(.7) saturate(.2);
+}
+
+.screen.on {
+  filter: brightness(1) contrast(1) saturate(1);
+  box-shadow: 0 0 60px rgba(0, 150, 255, .06), inset 0 0 140px rgba(0, 110, 255, .02);
+}
+
+.desktop {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity .6s ease, transform .6s ease;
+  z-index: 1;
+}
+
+.screen.on .desktop {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.welcome {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: .6px;
+  text-align: center;
+  max-width: 70%;
+}
+
+.clock {
+  font-size: 14px;
+  opacity: .9;
+}
+
+.desktop img {
+  position: absolute;
+  bottom: 18px;
+  left: 18px;
+  width: 140px;
+  opacity: .95;
+  cursor: pointer;
+  z-index: 3;
+}
+
+.controls {
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn {
+  background: #0c6df0;
+  border: none;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 8px 20px rgba(12, 109, 240, .18);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+
+.btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 6px 16px rgba(12, 109, 240, .12);
+}
+
+.led {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #20303f;
+  box-shadow: inset 0 -2px 2px rgba(0, 0, 0, .6);
+}
+
+.led.on {
+  background: #36ff96;
+  box-shadow: 0 0 8px rgba(54, 255, 150, .22);
+}
+
+.stand {
+  height: 18px;
+  margin-top: 12px;
+  background: linear-gradient(180deg, #0b0f12, #05080a);
+  border-radius: 6px;
+}
+
+button:focus {
+  outline: 3px solid rgba(12, 109, 240, .18);
+}
+
+@media (max-width:520px) {
+  .screen {
+    height: 240px;
+  }
+}
+
+/* Niveaux */
+.levels-container {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  background: rgba(0, 0, 0, 0.95);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  justify-content: flex-start;
+  align-items: center;
+  z-index: 5;
+}
+
+.fullscreen-btn {
+  position: absolute;
+  top: 6px;
+  left: 12px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  background: #0c6df0;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  z-index: 6;
+}
+
+.levels-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 110px);
+  gap: 12px;
+  width: 100%;
+  max-width: 600px;
+  margin-top: 50px;
+  justify-content: center;
+}
+
+.level {
+  background: #1d2430;
+  padding: 16px;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s ease;
+}
+
+.level.completed {
+  background-color: green;
+}
+
+.level:hover {
+  background: #263043;
+}
+
+.back-btn {
+  align-self: flex-end;
+  margin-left: auto;
+  margin-bottom: 10px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  background: #f00;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Modaux niveaux et quiz */
+.level1-modal,
+.level2-modal,
+.level3-modal,
+.level4-modal {
+  display: none;
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.95);
+  border-radius: 12px;
+  padding: 20px;
+  z-index: 10;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.level1-modal h2,
+.level2-modal h2,
+.level3-modal h2,
+.level4-modal h2 {
+  color: #36ff96;
+  margin-bottom: 20px;
+}
+
+.level1-modal p,
+.level2-modal p,
+.level3-modal p,
+.level4-modal p {
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.level1-modal .link-button,
+.level2-modal .link-button,
+.level3-modal .link-button,
+.level4-modal .link-button {
+  display: inline-block;
+  padding: 12px 24px;
+  background-color: #0c6df0;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.level1-modal .link-button:hover,
+.level2-modal .link-button:hover,
+.level3-modal .link-button:hover,
+.level4-modal .link-button:hover {
+  background-color: #0a5bc0;
+}
+
+.level1-modal .close-btn,
+.level2-modal .close-btn,
+.level3-modal .close-btn,
+.level4-modal .close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #f00;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.quiz-navigation {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+#currentQuestionContainer {
+  margin-bottom: 20px;
+}
+
+#light {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #333;
+  margin-top: 15px;
+  transition: transform 0.2s linear;
+}

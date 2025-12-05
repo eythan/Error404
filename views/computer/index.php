@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ordinateur - Start</title>
+  <style>
+
+    body {
+      margin: 0;
+      background: #0b1220;
+      color: #fff;
+      overflow: hidden;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    .computer-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: calc(100vh - 60px);
+    }
+
+    .computer {
+      width: 720px;
+      max-width: 95vw;
+      transition: all 0.3s ease;
+    }
+
+    .computer.fullscreen {
+      width: 95vw;
+      height: 95vh;
+    }
+
+    .monitor {
+      background: #111316;
+      border-radius: 12px;
+      padding: 22px 22px 28px;
+      box-shadow: 0 20px 50px rgba(2, 6, 23, .7), inset 0 2px 0 rgba(255, 255, 255, .02);
+      height: 100%;
+    }
+
+    .screen-wrap {
+      background: #050508;
+      border-radius: 8px;
+      padding: 18px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      height: 100%;
+    }
+
+    .screen {
+      width: 100%;
+      height: 360px;
+      border-radius: 6px;
+      background: #000;
+      overflow: hidden;
+      position: relative;
+      box-shadow: inset 0 -30px 80px rgba(0, 0, 0, .6);
+      transition: filter .7s ease, box-shadow .7s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .screen.off {
+      filter: brightness(.03) contrast(.7) saturate(.2);
+    }
+
+    .screen.on {
+      filter: brightness(1) contrast(1) saturate(1);
+      box-shadow: 0 0 60px rgba(0, 150, 255, .06), inset 0 0 140px rgba(0, 110, 255, .02);
+    }
+
+    .desktop {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity .6s ease, transform .6s ease;
+      z-index: 1;
+    }
+
+    .screen.on .desktop {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .welcome {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: .6px;
+      text-align: center;
+      max-width: 70%;
+    }
+
+    .clock {
+      font-size: 14px;
+      opacity: .9;
+    }
+
+    .desktop img {
+      position: absolute;
+      bottom: 18px;
+      left: 18px;
+      width: 140px;
+      opacity: .95;
+      cursor: pointer;
+      z-index: 3;
+    }
+
+    .controls {
+      margin-top: 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      background: #0c6df0;
+      border: none;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 600;
+      box-shadow: 0 8px 20px rgba(12, 109, 240, .18);
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 6px 16px rgba(12, 109, 240, .12);
+    }
+
+    .led {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #20303f;
+      box-shadow: inset 0 -2px 2px rgba(0, 0, 0, .6);
+    }
+
+    .led.on {
+      background: #36ff96;
+      box-shadow: 0 0 8px rgba(54, 255, 150, .22);
+    }
+
+    .stand {
+      height: 18px;
+      margin-top: 12px;
+      background: linear-gradient(180deg, #0b0f12, #05080a);
+      border-radius: 6px;
+    }
+
+    button:focus {
+      outline: 3px solid rgba(12, 109, 240, .18);
+    }
+
+    @media (max-width:520px) {
+      .screen {
+        height: 240px
+      }
+    }
+
+    .levels-container {
+      position: absolute;
+      inset: 0;
+      margin: 0;
+      background: rgba(0, 0, 0, 0.95);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      justify-content: flex-start;
+      align-items: center;
+      z-index: 5;
+    }
+
+    .fullscreen-btn {
+      position: absolute;
+      top: 6px;
+      left: 12px;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      background: #0c6df0;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      z-index: 6;
+    }
+
+    .levels-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 110px);
+      gap: 12px;
+      width: 100%;
+      max-width: 600px;
+      margin-top: 50px;
+      justify-content: center;
+    }
+
+    .level {
+      background: #1d2430;
+      padding: 16px;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s ease;
+    }
+
+    .level.completed {
+      background-color: green;
+    }
+
+    .level:hover {
+      background: #263043;
+    }
+
+    .back-btn {
+      align-self: flex-end;
+      margin-left: auto;
+      margin-bottom: 10px;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      background: #f00;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .level1-modal,
+    .level2-modal,
+    .level3-modal,
+    .level4-modal {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.95);
+      border-radius: 12px;
+      padding: 20px;
+      z-index: 10;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .level1-modal h2,
+    .level2-modal h2,
+    .level3-modal h2,
+    .level4-modal h2 {
+      color: #36ff96;
+      margin-bottom: 20px;
+    }
+
+    .level1-modal p,
+    .level2-modal p,
+    .level3-modal p,
+    .level4-modal p {
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .level1-modal .link-button,
+    .level2-modal .link-button,
+    .level3-modal .link-button,
+    .level4-modal .link-button {
+      display: inline-block;
+      padding: 12px 24px;
+      background-color: #0c6df0;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+
+    .level1-modal .link-button:hover,
+    .level2-modal .link-button:hover,
+    .level3-modal .link-button:hover,
+    .level4-modal .link-button:hover {
+      background-color: #0a5bc0;
+    }
+
+    .level1-modal .close-btn,
+    .level2-modal .close-btn,
+    .level3-modal .close-btn,
+    .level4-modal .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #f00;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .quiz-navigation {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    #currentQuestionContainer {
+      margin-bottom: 20px;
+    }
+
+    #light {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #333;
+      margin-top: 15px;
+      transition: transform 0.2s linear;
+    }
+  </style>
+</head>
+
+<body>
+      <?php include 'views/chatbot/index.php'; ?>
+  <?php include 'views/layouts/header.php'; ?>
+  <div class="computer-wrapper">
+    <div class="computer" id="computer">
+      <div class="monitor">
+        <div class="screen-wrap">
+          <div id="screen" class="screen off" role="img" aria-label="Écran éteint">
+            <button id="fullscreenBtn" class="fullscreen-btn">Fullscreen</button>
+
+            <div id="levelsContainer" class="levels-container" style="display:none;">
+              <button id="backBtn" class="back-btn">Retour</button>
+              <div class="levels-grid" id="levelsGrid"></div>
+            </div>
+
+            <div id="level1Modal" class="level1-modal">
+              <button class="close-btn" id="closeLevel1Modal">Retour</button>
+              <h2>Niveau 1</h2>
+              <p>Cliquez sur le bouton ci-dessous pour accéder à la plateforme.</p>
+              <a href="https://nird.forge.apps.education.fr/index.html" target="_blank" rel="noopener noreferrer"
+                class="link-button">Accéder à la plateforme</a>
+            </div>
+
+            <div id="level2Modal" class="level2-modal">
+              <button class="close-btn" id="closeLevel2Modal">Retour</button>
+              <h2>Niveau 2 - Quiz NIRD</h2>
+              <div id="quizContainer">
+                <div id="currentQuestionContainer"></div>
+                <div class="quiz-navigation">
+                  <button id="prevQuestionBtn" class="link-button">Précédent</button>
+                  <button id="nextQuestionBtn" class="link-button">Suivant</button>
+                </div>
+              </div>
+              <button id="submitQuizBtn" class="link-button">Terminer</button>
+            </div>
+
+            <div id="level3Modal" class="level3-modal">
+              <button class="close-btn" id="closeLevel3Modal">Retour</button>
+              <h2>Niveau 3 - Tri d'images</h2>
+              <p>Glissez les images vers la zone "Recyclé" ou "Réutilisé".</p>
+              <div id="imagesContainer"
+                style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:20px;">
+                <img src="public/assets/images/img1.jpg" id="img1" draggable="true" width="160">
+                <img src="public/assets/images/img2.jpeg" id="img2" draggable="true" width="160">
+                <img src="public/assets/images/img3.jpg" id="img3" draggable="true" width="160">
+                <img src="public/assets/images/img4.jpg" id="img4" draggable="true" width="160">
+                <img src="public/assets/images/img5.jpg" id="img5" draggable="true" width="160">
+                <img src="public/assets/images/img6.jpg" id="img6" draggable="true" width="160">
+                <img src="public/assets/images/img7.jpg" id="img7" draggable="true" width="160">
+                <img src="public/assets/images/img8.jpg" id="img8" draggable="true" width="160">
+                <img src="public/assets/images/img9.jpg" id="img9" draggable="true" width="160">
+                <img src="public/assets/images/img10.png" id="img10" draggable="true" width="160">
+              </div>
+              <div style="display:flex;justify-content:center;gap:50px;margin-bottom:20px;">
+                <div id="recycleZone"
+                  style="width:150px;height:150px;border:2px dashed green;border-radius:12px;display:flex;align-items:center;justify-content:center;">
+                  Recyclé</div>
+                <div id="reuseZone"
+                  style="width:150px;height:150px;border:2px dashed orange;border-radius:12px;display:flex;align-items:center;justify-content:center;">
+                  Réutilisé</div>
+              </div>
+              <button id="submitLevel3Btn" class="link-button">Vérifier</button>
+            </div>
+
+            <div id="level4Modal" class="level4-modal">
+              <button class="close-btn" id="closeLevel4Modal">Retour</button>
+              <h2>Niveau 4 - Pédalier</h2>
+              <p>Pédalez pour allumer la lumière ! 30 tours nécessaires.</p>
+              <button id="pedalBtn" class="link-button">Pédaler</button>
+              <div id="pedalCounter" style="margin-top:15px;">Tours effectués : 0 / 30</div>
+              <div id="light"></div>
+            </div>
+
+            <div class="desktop" id="desktop">
+              <img src="public/assets/images/logoNird.png" alt="Logo">
+              <div class="welcome">Cliquez sur le logo pour commencer <br>
+              En reusissant tout les niveau un jeu secret apparaitra
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button id="startBtn" class="btn" aria-pressed="false">Start</button>
+          <div id="led" class="led" title="Power" aria-hidden="true"></div>
+        </div>
+        <div class="stand"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const startBtn = document.getElementById('startBtn');
+    const screen = document.getElementById('screen');
+    const led = document.getElementById('led');
+    const desktop = document.getElementById('desktop');
+    const clock = document.getElementById('clock');
+    const computer = document.getElementById('computer');
+    let on = false, clockTimer = null;
+    function formatTime(d) { const h = String(d.getHours()).padStart(2, '0'); const m = String(d.getMinutes()).padStart(2, '0'); const s = String(d.getSeconds()).padStart(2, '0'); return `${h}:${m}:${s}`; }
+    function updateClock() { clock.textContent = formatTime(new Date()); }
+    function powerToggle() { on = !on; if (on) { screen.classList.remove('off'); screen.classList.add('on'); screen.setAttribute('aria-label', 'Écran allumé'); led.classList.add('on'); startBtn.textContent = 'Shutdown'; startBtn.setAttribute('aria-pressed', 'true'); desktop.style.opacity = 0; setTimeout(() => { desktop.style.opacity = 1; updateClock(); clockTimer = setInterval(updateClock, 1000); }, 700); } else { screen.classList.remove('on'); screen.classList.add('off'); screen.setAttribute('aria-label', 'Écran éteint'); led.classList.remove('on'); startBtn.textContent = 'Start'; startBtn.setAttribute('aria-pressed', 'false'); desktop.style.opacity = 0; if (clockTimer) { clearInterval(clockTimer); clockTimer = null; } } }
+    startBtn.addEventListener('click', powerToggle);
+    startBtn.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); powerToggle(); } });
+
+    const levelsContainer = document.getElementById("levelsContainer");
+    const levelsGrid = document.getElementById("levelsGrid");
+    const logo = document.querySelector('#desktop img');
+    const backBtn = document.getElementById('backBtn');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+    function renderLevels() {
+      levelsGrid.innerHTML = "";
+      for (let i = 1; i <= 6; i++) {
+        const lvl = document.createElement("div");
+        lvl.className = "level"; lvl.textContent = "Niveau " + i;
+
+        if (i === 1) lvl.addEventListener("click", () => { levelsContainer.style.display = "none"; document.getElementById('level1Modal').style.display = "flex"; });
+        if (i === 2) lvl.addEventListener("click", () => { levelsContainer.style.display = "none"; document.getElementById('level2Modal').style.display = "flex"; currentQuestionIndex = 0; renderQuiz(); });
+        if (i === 3) lvl.addEventListener("click", () => { levelsContainer.style.display = "none"; document.getElementById('level3Modal').style.display = "flex"; showCurrentImage(); });
+        if (i === 4) lvl.addEventListener("click", () => { levelsContainer.style.display = "none"; document.getElementById('level4Modal').style.display = "flex"; resetPedalier(); });
+
+        levelsGrid.appendChild(lvl);
+      }
+    }
+
+    renderLevels();
+
+    logo.addEventListener('click', () => { levelsContainer.style.display = levelsContainer.style.display === "none" ? "flex" : "none"; });
+    backBtn.addEventListener('click', () => { levelsContainer.style.display = "none"; });
+    fullscreenBtn.addEventListener('click', () => { if (!document.fullscreenElement) { computer.requestFullscreen().then(() => computer.classList.add('fullscreen')); } else { document.exitFullscreen().then(() => computer.classList.remove('fullscreen')); } });
+
+    const closeLevel1Modal = document.getElementById('closeLevel1Modal');
+    closeLevel1Modal.addEventListener('click', () => {
+      document.getElementById('level1Modal').style.display = 'none';
+      levelsContainer.style.display = 'flex';
+    });
+
+    const level1Link = document.querySelector('#level1Modal .link-button');
+    level1Link.addEventListener('click', () => {
+      alert("Bravo ! Vous avez réussi le niveau 1 (D)");
+      document.getElementById('level1Modal').style.display = 'none';
+      levelsContainer.style.display = 'flex';
+      document.querySelectorAll('.level').forEach(l => { if (l.textContent === "Niveau 1") l.classList.add('completed'); });
+    });
+
+    const level2Modal = document.getElementById('level2Modal');
+    const closeLevel2Modal = document.getElementById('closeLevel2Modal');
+    const currentQuestionContainer = document.getElementById('currentQuestionContainer');
+    const prevQuestionBtn = document.getElementById('prevQuestionBtn');
+    const nextQuestionBtn = document.getElementById('nextQuestionBtn');
+    const submitQuizBtn = document.getElementById('submitQuizBtn');
+    let currentQuestionIndex = 0;
+    let userAnswers = Array(8).fill(null);
+    const quizQuestions = [
+      { q: "Que signifie le 'N' dans NIRD ?", options: ["Numérique", "Nature", "Nouveau", "Normal"], answer: 0 },
+      { q: "Quel système d'exploitation libre est encouragé par la démarche NIRD ?", options: ["Windows", "Linux", "macOS", "Android"], answer: 1 },
+      { q: "La démarche NIRD vise un numérique :", options: ["Inclusif, Responsable et Durable", "Rapide et Cher", "Compliqué et Polluant", "Réservé aux experts"], answer: 0 },
+      { q: "Quel est l'un des objectifs du reconditionnement d'ordinateurs dans la démarche NIRD ?", options: ["Lutter contre l'obsolescence programmée", "Acheter plus d'ordinateurs neufs", "Utiliser uniquement des tablettes", "Ignorer les anciens ordinateurs"], answer: 0 },
+      { q: "Pourquoi la démarche NIRD encourage-t-elle l'utilisation de Linux ?", options: ["Pour réduire les coûts et l'impact environnemental", "Parce que c'est plus compliqué", "Pour obligatoirement acheter du matériel neuf", "Pour interdire l'accès à Internet"], answer: 0 },
+      { q: "Quel est l'un des piliers de la démarche NIRD ?", options: ["L'inclusion", "L'exclusion", "La pollution", "Le gaspillage"], answer: 0 },
+      { q: "La démarche NIRD s'adresse en premier lieu à :", options: ["Les enseignants et établissements scolaires", "Les entreprises privées", "Les gouvernements étrangers", "Les musées"], answer: 0 },
+      { q: "Quel est l'un des avantages du reconditionnement d'ordinateurs ?", options: ["Réduire les déchets électroniques", "Augmenter la pollution", "Rendre les ordinateurs plus lents", "Empêcher les élèves d'apprendre"], answer: 0 }
+    ];
+
+    function renderQuiz() {
+      currentQuestionContainer.innerHTML = "";
+      const q = quizQuestions[currentQuestionIndex];
+      const counter = document.createElement('div'); counter.textContent = `Question ${currentQuestionIndex + 1} / ${quizQuestions.length}`; counter.style.marginBottom = '10px'; currentQuestionContainer.appendChild(counter);
+      const div = document.createElement("div"); const question = document.createElement("p"); question.textContent = q.q; div.appendChild(question);
+      q.options.forEach((opt, i) => { const label = document.createElement("label"); label.style.display = "block"; const input = document.createElement("input"); input.type = "radio"; input.name = "q" + currentQuestionIndex; input.value = i; if (userAnswers[currentQuestionIndex] === i) input.checked = true; input.addEventListener('change', () => { userAnswers[currentQuestionIndex] = i; }); label.appendChild(input); label.appendChild(document.createTextNode(" " + opt)); div.appendChild(label); });
+      currentQuestionContainer.appendChild(div);
+      prevQuestionBtn.style.display = currentQuestionIndex === 0 ? "none" : "block";
+      nextQuestionBtn.style.display = currentQuestionIndex === quizQuestions.length - 1 ? "none" : "block";
+      submitQuizBtn.style.display = currentQuestionIndex === quizQuestions.length - 1 ? "block" : "none";
+    }
+    prevQuestionBtn.addEventListener("click", () => { if (currentQuestionIndex > 0) { currentQuestionIndex--; renderQuiz(); } });
+    nextQuestionBtn.addEventListener("click", () => { if (currentQuestionIndex < quizQuestions.length - 1) { currentQuestionIndex++; renderQuiz(); } });
+    submitQuizBtn.addEventListener("click", () => { let score = 0; quizQuestions.forEach((q, index) => { if (userAnswers[index] === q.answer) score++; }); if (score >= 5) { alert(`Félicitations ! Vous avez réussi le niveau 2 avec ${score}/${quizQuestions.length} bonnes réponses ! (R)`); document.querySelectorAll('.level').forEach(l => { if (l.textContent === "Niveau 2") l.classList.add('completed'); }); level2Modal.style.display = "none"; } else { alert(`Vous avez obtenu ${score}/${quizQuestions.length}.`); } });
+    closeLevel2Modal.addEventListener("click", () => { level2Modal.style.display = "none"; levelsContainer.style.display = "flex"; });
+
+    const imgs = document.querySelectorAll('#imagesContainer img');
+    const recycleZone = document.getElementById('recycleZone');
+    const reuseZone = document.getElementById('reuseZone');
+    const correctZones = { 'img3': 'recycleZone', 'img5': 'recycleZone', 'img9': 'recycleZone', 'img1': 'reuseZone', 'img2': 'reuseZone', 'img4': 'reuseZone', 'img6': 'reuseZone', 'img7': 'reuseZone', 'img8': 'reuseZone', 'img10': 'reuseZone' };
+    let currentImgIndex = 0;
+    function showCurrentImage() { imgs.forEach((img, i) => { img.style.display = (i === currentImgIndex) ? 'block' : 'none'; }); }
+    imgs.forEach(img => { img.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', e.target.id); }); });
+    [recycleZone, reuseZone].forEach(zone => {
+      zone.addEventListener('dragover', e => e.preventDefault());
+      zone.addEventListener('drop', e => {
+        e.preventDefault();
+        const id = e.dataTransfer.getData('text/plain');
+        const img = document.getElementById(id);
+        if (correctZones[id] === zone.id) {
+          zone.appendChild(img);
+          currentImgIndex++;
+          if (currentImgIndex >= imgs.length) currentImgIndex = imgs.length - 1;
+          showCurrentImage();
+        } else { alert("Mauvaise zone ! Cette image ne peut pas être déposée ici."); }
+      });
+    });
+    document.getElementById('submitLevel3Btn').addEventListener('click', () => {
+      let allCorrect = true;
+      for (const [imgId, zoneId] of Object.entries(correctZones)) {
+        const img = document.getElementById(imgId);
+        if (img.parentElement.id !== zoneId) { allCorrect = false; break; }
+      }
+      if (allCorrect) {
+        alert("Bravo ! Vous avez réussi le niveau 3 ! (I)");
+        document.getElementById('level3Modal').style.display = 'none';
+        document.querySelectorAll('.level').forEach(l => { if (l.textContent === "Niveau 3") l.classList.add('completed'); });
+      } else { alert("Certaines images ne sont pas correctement placées. Essayez encore !"); }
+    });
+    document.getElementById('closeLevel3Modal').addEventListener('click', () => { document.getElementById('level3Modal').style.display = 'none'; levelsContainer.style.display = 'flex'; });
+
+    const level4Modal = document.getElementById('level4Modal');
+    const closeLevel4Modal = document.getElementById('closeLevel4Modal');
+    const pedalBtn = document.getElementById('pedalBtn');
+    const pedalCounter = document.getElementById('pedalCounter');
+    const light = document.getElementById('light');
+    let pedalCount = 0;
+    const targetPedals = 30;
+    const energyPerPedal = 5;
+    let rotation = 0;
+    function resetPedalier() { pedalCount = 0; rotation = 0; pedalCounter.textContent = `Tours effectués : 0 / ${targetPedals}`; light.style.background = '#333'; light.style.transform = 'rotate(0deg)'; }
+    pedalBtn.addEventListener('click', () => {
+      pedalCount++;
+      rotation += 30;
+      pedalCounter.textContent = `Tours effectués : ${pedalCount} / ${targetPedals}`;
+      light.style.transform = `rotate(${rotation}deg)`;
+      if (pedalCount >= targetPedals) {
+        light.style.background = 'yellow';
+        const totalEnergy = pedalCount * energyPerPedal;
+        const computerSeconds = Math.floor(totalEnergy / 0.1);
+        alert(`Bravo ! Vous avez réussi le niveau 4 ! (N)\nEn ${targetPedals} tours, vous avez généré ${totalEnergy} kJ, soit l'énergie utilisée par un ordinateur classique pendant ${computerSeconds} secondes.`);
+        level4Modal.style.display = 'none';
+        levelsContainer.style.display = 'flex';
+        document.querySelectorAll('.level').forEach(level => { if (level.textContent === "Niveau 4") level.classList.add('completed'); });
+      }
+    });
+    closeLevel4Modal.addEventListener('click', () => { level4Modal.style.display = 'none'; levelsContainer.style.display = 'flex'; });
+  </script>
+</body>
+
+</html>
