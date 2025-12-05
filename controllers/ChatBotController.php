@@ -45,6 +45,19 @@ PROMPT;
         }
     }
 
+    if (isset($_GET['ajax'])) {
+        if (preg_match('/```json\s*(\{.*\})\s*```/s', $answer, $matches)) {
+            $jsonString = $matches[1];
+            $decoded = json_decode($jsonString, true);
+            $reponseText = $decoded['reponse'] ?? "PhiloBidon médite en silence…";
+        } else {
+            $reponseText = trim($answer, "` \n\r\t");
+        }
+
+        echo json_encode(['reponse' => $reponseText]);
+        exit;
+    }
+
     require 'views/chatbot/index.php';
     exit;
 }
