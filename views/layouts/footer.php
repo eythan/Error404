@@ -1,10 +1,7 @@
-</main>
-
-<footer>
-    <p>© 2025 - Mon Framework MVC</p>
+<footer style="text-align:center; color:#fff; margin-top:40px; font-family:'VT323', monospace;">
+    &copy; 2025 - NIRD - Résistance Numérique
 </footer>
 
-<script src="/public/assets/js/app.js"></script>
-
 </body>
+
 </html>

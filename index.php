@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-$controller = $_GET['controller'] ?? 'chatbot';
+$controller = $_GET['controller'] ?? 'main';
 $action = $_GET['action'] ?? 'index';
 
 if ($controller == 'main') {
